@@ -1,5 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import logo from "./logo.svg";
+import "./App.css";
 
 function App() {
   return (
@@ -20,6 +21,16 @@ function App() {
       </header>
     </div>
   );
+}
+
+{
+  /* <Router>
+<Routes>
+  <Route path="/" element={<Login />} />
+  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+  <Route path="/user/dashboard" element={<UserDashboard />} />
+</Routes>
+</Router> */
 }
 
 export default App;

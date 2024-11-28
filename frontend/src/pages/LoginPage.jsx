@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { login } from "../APIs/loginAPI";
 
 function Login() {
@@ -8,6 +9,8 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const loginHandler = async () => {
     setError("");
     setLoading(true);
@@ -15,7 +18,13 @@ function Login() {
     try {
       const data = await login(mail, password);
 
-      console.log("Login successfull!", data);
+      console.log("Login successfull!", data); // Sweetalert swal.fire kullanılabilir
+
+      if (data.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/user-dashboard");
+      }
 
       // bu kısımda JWT kullanıp token oluşturmak gerekiyor ve tokenı localStorage'a kaydetmemiz lazım
       // localStorage.setItem("token", data.token);
