@@ -13,6 +13,17 @@ export const fetchCharacter = async () => {
   }
 };
 
+export const fetchClasses = async () => {
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (err) {
+    throw new Error(
+      err.response?.data?.message || "Classes can not be fetched!"
+    );
+  }
+};
+
 export const addCharacter = async (character) => {
   try {
     const response = await axios.post(API_URL, character);
