@@ -2,9 +2,9 @@ import axios from "axios";
 
 const API_URL = "/character"; // Backend URL - Controller based
 
-export const fetchCharacter = async () => {
+export const fetchCharacter = async (id) => {
   try {
-    const response = await axios.get(API_URL);
+    const response = await axios.get(`${API_URL}/${id}`);
     return response.data; // Axios hata durumunda otomatik olarak catch bloğuna düşer
   } catch (err) {
     throw new Error(

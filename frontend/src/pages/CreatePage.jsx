@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addCharacter } from "../APIs/characterAPI"; // updateCharacter API fonksiyonu
-import { getClasses } from "../APIs/characterAPI"; // API'den sınıfları getiren fonksiyon
+import { addCharacter, fetchClasses } from "../APIs/characterAPI"; // updateCharacter API fonksiyonu
 
 function NewCharacter() {
   const [newCharacter, setNewCharacter] = useState({
@@ -22,15 +21,15 @@ function NewCharacter() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    const getClasses = async () => {
       try {
-        const data = await getClasses(); // Sınıfları getiren API fonksiyonunu çağırma
+        const data = await fetchClasses(); // Sınıfları getiren API fonksiyonunu çağırma
         setClasses(data);
       } catch (err) {
         console.log(err.message);
       }
     };
-    fetchClasses();
+    getClasses();
   }, []);
 
   const handleInputChange = (e) => {
