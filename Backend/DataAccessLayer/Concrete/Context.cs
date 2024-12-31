@@ -12,6 +12,8 @@ namespace Backend.DataAccessLayer.Concrete
         public DbSet<User> Users { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Character> Characters { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<ItemType> ItemTypes { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Weapon> Weapons { get; set; }
         public DbSet<Armor> Armors { get; set; }
@@ -23,7 +25,9 @@ namespace Backend.DataAccessLayer.Concrete
         public DbSet<Proficiency> Proficiencies { get; set; }
         public DbSet<Spell> Spells { get; set; }
         public DbSet<Ability> Abilities { get; set; }
-        public DbSet<Feature> Features { get; set; }
+        public DbSet<ArmorType> ArmorTypes { get; set; }
+        public DbSet<DamageType> DamageTypes { get; set; }
+        public DbSet<CharacterFeature> CharacterFeatures { get; set; }
         public DbSet<CharacterSkill> CharacterSkills { get; set; }
         public DbSet<CharacterSpell> CharacterSpells { get; set; }
         public DbSet<CharacterProficiency> CharacterProficiencies { get; set; }
