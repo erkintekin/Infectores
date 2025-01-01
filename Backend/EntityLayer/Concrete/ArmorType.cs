@@ -9,6 +9,6 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ArmorTypeID { get; set; }
-        public string ArmorType { get; set; }
+        public string Type { get; set; }
     }
 }

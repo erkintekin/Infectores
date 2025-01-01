@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Backend.EntityLayer.Concrete
 {
-    public class CharacterSenses
+    public class CharacterSense
     {
         [Key]
         public int CharacterSensesID { get; set; }
