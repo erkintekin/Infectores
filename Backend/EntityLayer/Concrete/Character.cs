@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.EntityLayer.Concrete
 {
@@ -19,11 +21,11 @@ namespace Backend.EntityLayer.Concrete
         public int XP { get; set; } = 0;
         public int InventoryID { get; set; }
         public Inventory? Inventory { get; set; }
-        public bool isMOB { get; set; } = false;
-        public bool isNPC { get; set; } = false;
+        public bool? IsMOB { get; set; } = false;
+        public bool? IsNPC { get; set; } = false;
         public int ArmorClass { get; set; } = 10;
         //public string DefaultActions { get; set; }
-        public ICollections<CharacterCondition>? Conditions { get; set; }
+        public ICollection<CharacterCondition>? Conditions { get; set; }
         public ICollection<CharacterSkill>? Skills { get; set; }
         public ICollection<CharacterSpell>? Spells { get; set; }
         public ICollection<CharacterProficiency>? Proficiencies { get; set; }

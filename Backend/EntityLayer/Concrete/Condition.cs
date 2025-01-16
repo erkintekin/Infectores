@@ -7,13 +7,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.EntityLayer.Concrete
 {
-    public class CharacterSkill
+    public class Condition
     {
         [Key]
-        public int CharacterSkillID { get; set; }
-        public int CharacterID { get; set; }
-        public Character Character { get; set; }
-        public int SkillID { get; set; }
-        public Skill Skill { get; set; }
+        public int ConditionID { get; set; }
+        [Required]
+        public string Name { get; set; }
+        public bool? IsActive { get; set; } = false;
     }
 }
