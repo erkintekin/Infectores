@@ -12,7 +12,6 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         public int ThrowID { get; set; }
         public string Modifier { get; set; }
-        public int Value { get; set; } // It must not be a hard code!
 
     }
 }

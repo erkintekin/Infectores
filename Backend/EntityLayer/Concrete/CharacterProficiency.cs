@@ -10,9 +10,9 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterProficiency
     {
         [Key]
-        public int CharacterProficiencyID { get; set; }
         public int CharacterID { get; set; }
         public Character Character { get; set; }
+        [Key]
         public int ProficiencyID { get; set; }
         public Proficiency Proficiency { get; set; }
     }

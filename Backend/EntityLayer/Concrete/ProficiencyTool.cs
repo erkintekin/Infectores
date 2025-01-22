@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Backend.EntityLayer.Concrete
 {
-    public class SpellComponent
+    public class ProficiencyTool
     {
         [Key]
-        public int SpellID { get; set; }
-        public Spell Spell { get; set; }
+        public int ProficiencyID { get; set; }
+        public Proficiency Proficiency { get; set; }
+
         [Key]
-        public int ComponentID { get; set; }
-        public Component Component { get; set; }
+        public int ToolID { get; set; }
+        public Tool Tool { get; set; }
     }
 }

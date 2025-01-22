@@ -10,10 +10,13 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterSpell
     {
         [Key]
-        public int CharacterSpellID { get; set; }
         public int CharacterID { get; set; }
         public Character Character { get; set; }
+
+        [Key]
         public int SpellID { get; set; }
         public Spell Spell { get; set; }
+        public int Level { get; set; }
+
     }
 }

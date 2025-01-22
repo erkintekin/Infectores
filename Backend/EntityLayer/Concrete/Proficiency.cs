@@ -14,7 +14,7 @@ namespace Backend.EntityLayer.Concrete
         public string Name { get; set; }
         public ICollection<Armor> Armors { get; set; }
         public ICollection<Weapon> Weapons { get; set; }
-        public ICollection<Tool> Tools { get; set; }
+        public ICollection<ProficiencyTool> ProficiencyTools { get; set; }
         public ICollection<Class> Classes { get; set; }
         public ICollection<Language> Languages { get; set; }
     }

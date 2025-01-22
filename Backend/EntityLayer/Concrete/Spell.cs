@@ -18,7 +18,6 @@ namespace Backend.EntityLayer.Concrete
         public DamageType DamageType { get; set; }
         public string HitDice { get; set; }
         public string Description { get; set; }
-        public int Level { get; set; }
         public int Range { get; set; }
         public int Duration { get; set; }
         public ICollection<SpellComponent> Components { get; set; }

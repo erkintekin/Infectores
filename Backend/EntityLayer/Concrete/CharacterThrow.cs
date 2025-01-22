@@ -10,10 +10,12 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterThrow
     {
         [Key]
-        public int CharacterThrowID { get; set; }
         public int CharacterID { get; set; }
         public Character Character { get; set; }
+
+        [Key]
         public int ThrowID { get; set; }
         public Throw Throw { get; set; }
+        public int Value { get; set; }
     }
 }
