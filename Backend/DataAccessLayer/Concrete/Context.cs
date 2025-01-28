@@ -6,14 +6,51 @@ using Microsoft.EntityFrameworkCore;
 using Backend.EntityLayer.Concrete;
 using System.Security.Cryptography;
 
-
 namespace Backend.DataAccessLayer.Concrete
 {
     public static class ModelBuilderExtensions
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Proficiency>().HasData(new Proficiency { ProficiencyID = 1, Name = "Combat" });
+            modelBuilder.Entity<Proficiency>()
+            .HasData(
+            new Proficiency { ProficiencyID = 1, Name = "Combat" },
+            new Proficiency { ProficiencyID = 2, Name = "Magic" });
+
+            modelBuilder.Entity<Class>()
+            .HasData(
+            new Class { ClassID = 1, Name = "Wizard", Speed = 30, HitDice = "1d8", ProficiencyID = 1 },
+            new Class { ClassID = 2, Name = "Fighter", Speed = 25, HitDice = "1d10", ProficiencyID = 2 });
+
+            modelBuilder.Entity<ItemType>()
+            .HasData(
+            new ItemType { ItemTypeID = 1, Type = "Weapon" },
+            new ItemType { ItemTypeID = 2, Type = "Armor" });
+
+            modelBuilder.Entity<Item>()
+            .HasData(
+            new Item { ItemID = 1, Name = "Sword", GP = 10, Description = "A sharp blade.", ItemTypeID = 1 },
+            new Item { ItemID = 2, Name = "Shield", GP = 15, Description = "Protects against attacks.", ItemTypeID = 2 }
+            );
+
+            modelBuilder.Entity<Armor>()
+            .HasData(new Armor { Defense = 18, ArmorTypeID = 1, ItemID = 2 });
+
+            modelBuilder.Entity<User>()
+            .HasData(
+            new User { UserID = 1, Name = "John", Surname = "Doe", Age = 25, Mail = "john.doe@example.com", Password = "hashedpassword" },
+            new User { UserID = 2, Name = "Jane", Surname = "Smith", Age = 30, Mail = "jane.smith@example.com", Password = "hashedpassword" });
+
+            modelBuilder.Entity<Character>()
+            .HasData(
+            new Character { CharacterID = 1, Name = "Aragorn", Surname = "Son of Arathorn", UserID = 1, ClassID = 2, Level = 5, XP = 1200, ArmorClass = 15 },
+            new Character { CharacterID = 2, Name = "Gandalf", Surname = "The Grey", UserID = 2, ClassID = 1, Level = 10, XP = 3000, ArmorClass = 12 });
+
+            modelBuilder.Entity<ProficiencyTool>()
+            .HasData(
+            new ProficiencyTool { ProficiencyID = 1, ToolID = 1 },
+            new ProficiencyTool { ProficiencyID = 2, ToolID = 2 });
+
             modelBuilder.Entity<Class>().HasData(new Class { ClassID = 1, Name = "Wizard", Speed = 30, HitDice = "1d8", ProficiencyID = 1 });
         }
     }
@@ -58,9 +95,9 @@ namespace Backend.DataAccessLayer.Concrete
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Character>()
-                .HasOne(c => c.Inventory)
-                .WithOne(i => i.Character)
-                .HasForeignKey<Inventory>(i => i.CharacterID);
+            .HasOne(c => c.Inventory)
+            .WithOne(i => i.Character)
+            .HasForeignKey<Inventory>(i => i.CharacterID);
 
             modelBuilder.Entity<Class>()
             .HasOne(c => c.Proficiency)
@@ -187,13 +224,12 @@ namespace Backend.DataAccessLayer.Concrete
             .HasKey(m => m.ItemID);
 
             modelBuilder.Entity<Misc>()
-                .HasOne(m => m.Item)
-                .WithOne(i => i.Misc) // Item tarafında da navigasyon tanımı
-                .HasForeignKey<Misc>(m => m.ItemID);
+            .HasOne(m => m.Item)
+            .WithOne(i => i.Misc) // Item tarafında da navigasyon tanımı
+            .HasForeignKey<Misc>(m => m.ItemID);
 
-            modelBuilder.Entity<Armor>().HasData(
-                new Armor { Defense = 18, ArmorTypeID = 1, ItemID = 1 }
-            );
+            modelBuilder.Entity<Armor>()
+            .HasData(new Armor { Defense = 18, ArmorTypeID = 1, ItemID = 1 });
 
             modelBuilder.Entity<SpellComponent>()
             .HasKey(sc => new { sc.SpellID, sc.ComponentID });
@@ -212,14 +248,11 @@ namespace Backend.DataAccessLayer.Concrete
             .HasData(new Proficiency { ProficiencyID = 1 });
 
             modelBuilder.Entity<Class>()
-            .HasData(
-                new Class { ClassID = 1, HitDice = "1d8", Name = "Wizard", ProficiencyID = 1, Speed = 30 });
+            .HasData(new Class { ClassID = 1, HitDice = "1d8", Name = "Wizard", ProficiencyID = 1, Speed = 30 });
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
 
-
         }
-
     }
 }
