@@ -10,9 +10,11 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterAbility
     {
         [Key]
+        [Column(Order = 1)]
         public int CharacterID { get; set; }
         public Character Character { get; set; }
         [Key]
+        [Column(Order = 2)]
         public int AbilityID { get; set; }
         public Ability Ability { get; set; }
     }

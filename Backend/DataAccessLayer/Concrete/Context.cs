@@ -109,12 +109,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<ProficiencyTool>()
             .HasOne(k => k.Proficiency)
             .WithMany(k => k.ProficiencyTools)
-            .HasForeignKey(fk => fk.ProficiencyID);
+            .HasForeignKey(fk => fk.ProficiencyID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ProficiencyTool>()
             .HasOne(o => o.Tool)
             .WithMany(m => m.ProficiencyTools)
-            .HasForeignKey(fk => fk.ToolID);
+            .HasForeignKey(fk => fk.ToolID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterThrow>()
             .HasKey(ct => new { ct.CharacterID, ct.ThrowID });
@@ -122,12 +124,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterThrow>()
             .HasOne(ct => ct.Character)
             .WithMany(ct => ct.Throws)
-            .HasForeignKey(ct => ct.CharacterID);
+            .HasForeignKey(ct => ct.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterThrow>()
             .HasOne(ct => ct.Throw)
             .WithMany()
-            .HasForeignKey(ct => ct.ThrowID);
+            .HasForeignKey(ct => ct.ThrowID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSpell>()
             .HasKey(cs => new { cs.CharacterID, cs.SpellID });
@@ -135,12 +139,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterSpell>()
             .HasOne(cs => cs.Character)
             .WithMany(cs => cs.Spells)
-            .HasForeignKey(cs => cs.CharacterID);
+            .HasForeignKey(cs => cs.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSpell>()
             .HasOne(cs => cs.Spell)
             .WithMany()
-            .HasForeignKey(cs => cs.SpellID);
+            .HasForeignKey(cs => cs.SpellID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSkill>()
             .HasKey(cs => new { cs.CharacterID, cs.SkillID });
@@ -148,12 +154,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterSkill>()
             .HasOne(cs => cs.Character)
             .WithMany(cs => cs.Skills)
-            .HasForeignKey(cs => cs.CharacterID);
+            .HasForeignKey(cs => cs.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSkill>()
             .HasOne(cs => cs.Skill)
             .WithMany()
-            .HasForeignKey(cs => cs.SkillID);
+            .HasForeignKey(cs => cs.SkillID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterAbility>()
             .HasKey(ca => new { ca.CharacterID, ca.AbilityID });
@@ -161,12 +169,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterAbility>()
             .HasOne(ca => ca.Character)
             .WithMany(ca => ca.Abilities)
-            .HasForeignKey(ca => ca.CharacterID);
+            .HasForeignKey(ca => ca.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterAbility>()
             .HasOne(ca => ca.Ability)
             .WithMany()
-            .HasForeignKey(ca => ca.AbilityID);
+            .HasForeignKey(ca => ca.AbilityID)
+            .OnDelete(DeleteBehavior.Cascade); ;
 
             modelBuilder.Entity<CharacterCondition>()
             .HasKey(cc => new { cc.CharacterID, cc.ConditionID });
@@ -174,12 +184,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterCondition>()
             .HasOne(cc => cc.Character)
             .WithMany(cc => cc.Conditions)
-            .HasForeignKey(cc => cc.CharacterID);
+            .HasForeignKey(cc => cc.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterCondition>()
             .HasOne(cc => cc.Condition)
             .WithMany()
-            .HasForeignKey(cc => cc.ConditionID);
+            .HasForeignKey(cc => cc.ConditionID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterFeature>()
             .HasKey(cf => new { cf.CharacterID, cf.FeatureID });
@@ -187,12 +199,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterFeature>()
             .HasOne(cf => cf.Character)
             .WithMany(cf => cf.Features)
-            .HasForeignKey(cf => cf.CharacterID);
+            .HasForeignKey(cf => cf.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterFeature>()
             .HasOne(cf => cf.Feature)
             .WithMany()
-            .HasForeignKey(cf => cf.FeatureID);
+            .HasForeignKey(cf => cf.FeatureID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterProficiency>()
             .HasKey(cp => new { cp.CharacterID, cp.ProficiencyID });
@@ -200,12 +214,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterProficiency>()
             .HasOne(cp => cp.Character)
             .WithMany(cp => cp.Proficiencies)
-            .HasForeignKey(cp => cp.CharacterID);
+            .HasForeignKey(cp => cp.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterProficiency>()
             .HasOne(cp => cp.Proficiency)
             .WithMany()
-            .HasForeignKey(cp => cp.ProficiencyID);
+            .HasForeignKey(cp => cp.ProficiencyID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSense>()
             .HasKey(cp => new { cp.CharacterID, cp.SenseID });
@@ -213,12 +229,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<CharacterSense>()
             .HasOne(cs => cs.Character)
             .WithMany(cs => cs.Senses)
-            .HasForeignKey(cs => cs.CharacterID);
+            .HasForeignKey(cs => cs.CharacterID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CharacterSense>()
             .HasOne(cs => cs.Sense)
             .WithMany()
-            .HasForeignKey(cs => cs.SenseID);
+            .HasForeignKey(cs => cs.SenseID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Misc>()
             .HasKey(m => m.ItemID);
@@ -237,12 +255,14 @@ namespace Backend.DataAccessLayer.Concrete
             modelBuilder.Entity<SpellComponent>()
             .HasOne(cp => cp.Spell)
             .WithMany(cp => cp.Components)
-            .HasForeignKey(cp => cp.SpellID);
+            .HasForeignKey(cp => cp.SpellID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SpellComponent>()
             .HasOne(sp => sp.Component)
             .WithMany()
-            .HasForeignKey(sp => sp.ComponentID);
+            .HasForeignKey(sp => sp.ComponentID)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Proficiency>()
             .HasData(new Proficiency { ProficiencyID = 1 });
