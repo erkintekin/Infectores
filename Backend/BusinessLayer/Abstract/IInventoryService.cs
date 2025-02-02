@@ -9,7 +9,8 @@ namespace Backend.BusinessLayer.Abstract
     public interface IInventoryService
     {
         Task<List<InventoryItem>> GetAllInventoryItems(int inventoryId);
-        Task AddItemInventory(InventoryItem inventoryItem);
-        Task RemoveItemInventory(int inventoryId, int itemId);
+        Task<bool> AddItemToInventory(int inventoryId, int itemId, int quantity);
+        Task<bool> RemoveItemFromInventory(int inventoryId, int itemId);
     }
+
 }
