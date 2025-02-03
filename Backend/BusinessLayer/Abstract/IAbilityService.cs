@@ -10,7 +10,7 @@ namespace Backend.BusinessLayer.Abstract
     {
         Task<List<Ability>> GetAllAbilities();
         Task<List<CharacterAbility>> GetCharacterAbilities(int characterId);
-        void UpdateCharacterAbility(CharacterAbility characterAbility);
+        Task<bool> UpdateCharacterAbility(int characterId, int abilityId, int newValue);
 
     }
 }

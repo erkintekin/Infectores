@@ -20,9 +20,19 @@ namespace Backend.BusinessLayer.Concrete
             _characterAbilityRepository = characterAbilityRepository;
         }
 
-        public void UpdateCharacterAbility(CharacterAbility characterAbility)
+        public async Task<bool> UpdateCharacterAbility(int characterId, int abilityId, int newValue)
         {
-            _characterAbilityRepository.Update(characterAbility);  // Note: When the new ability score is under 0, warning have to pop up.
+            var characterAbility = await _characterAbilityRepository.List.FirstOrDefaultAsync(s => s.CharacterID == characterId && s.AbilityID == abilityId);
+
+            if (characterAbility == null)
+                return false;
+
+            if (newValue < 0)
+                throw new Exception("Ability score cannot be negative");
+
+            characterAbility.Value = newValue;
+            await _characterAbilityRepository.Update(characterAbility);
+            return true;
         }
 
         public async Task<List<CharacterAbility>> GetCharacterAbilities(int characterId) => await _characterAbilityRepository.List.Where(s => s.CharacterID == characterId).ToListAsync();

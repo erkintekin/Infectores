@@ -19,23 +19,47 @@ namespace Backend.BusinessLayer.Concrete
             _userRepository = userRepository;
         }
 
-        public void CreateUser(User user)
+        public async Task<User> CreateUser(User user)
         {
-            _userRepository.Create(user);
+            await _userRepository.Create(user);
+            return user;
         }
 
         public async Task<List<User>> GetAllUsers() => await _userRepository.List.ToListAsync();
         public async Task<User> GetUserById(int id) => await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == id) ?? throw new KeyNotFoundException($"User with ID {id} not found.");
-        public async Task<User> GetUserByEmail(string email) => await _userRepository.List.FirstOrDefaultAsync(s => s.Mail == email) ?? throw new KeyNotFoundException($"User with e-Mail {email} not found.");
-
-        public void UpdateUser(User user)
+        public async Task<User> GetUserByEmail(string email)
         {
-            _userRepository.Update(user);
+            var existingEmail = await _userRepository.List.FirstOrDefaultAsync(s => s.Mail == email);
+
+            if (existingEmail == null)
+            {
+                throw new KeyNotFoundException($"User with e-Mail {email} not found.");
+            }
+
+            return existingEmail;
         }
 
-        public void DeleteUser(User user)
+
+        public async Task<bool> UpdateUser(User user)
         {
-            _userRepository.Delete(user);
+            var existingUser = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+
+            if (existingUser == null)
+                return false;
+
+            await _userRepository.Update(user);
+            return true;
+        }
+
+        public async Task<bool> DeleteUser(int userId)
+        {
+            var existingUser = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == userId);
+
+            if (existingUser == null)
+                return false;
+
+            await _userRepository.Delete(existingUser);
+            return true;
         }
     }
 }

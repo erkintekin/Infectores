@@ -8,10 +8,10 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface ICharacterService
     {
-        void CreateCharacter(Character character);
+        Task<Character> CreateCharacter(Character character);
         Task<List<Character>> GetAllCharacters();
-        Task<Character> GetCharacterById(int id);
-        void UpdateCharacter(Character character);
-        void DeleteCharacter(Character character);
+        Task<Character> GetCharacterById(int characterId);
+        Task<bool> UpdateCharacter(Character character);
+        Task<bool> DeleteCharacter(int characterId);
     }
 }

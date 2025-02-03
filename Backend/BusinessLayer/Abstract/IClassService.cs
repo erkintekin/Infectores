@@ -8,11 +8,11 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface IClassService
     {
-        void CreateClass(Class classEntity);
+        Task<Class> CreateClass(Class classEntity);
         Task<List<Class>> GetAllClasses();
         Task<Class> GetClassById(int id);
-        void UpdateClass(Class classEntity);
-        void DeleteClass(Class classEntity);
+        Task<bool> UpdateClass(Class classEntity);
+        Task<bool> DeleteClass(int characterId);
 
     }
 }

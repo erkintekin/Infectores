@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.BusinessLayer.Abstract;
@@ -20,16 +21,18 @@ namespace Backend.BusinessLayer.Concrete
             _inventoryRepository = inventoryRepository;
         }
 
-        public void CreateCharacter(Character character)
+        public async Task<Character> CreateCharacter(Character character)
         {
-            _characterRepository.Create(character);
+            await _characterRepository.Create(character);
 
             var inventory = new Inventory
             {
                 CharacterID = character.CharacterID
             };
 
-            _inventoryRepository.Create(inventory);  // Character and Inventory are creating in same method.
+            await _inventoryRepository.Create(inventory);  // Character and Inventory are creating in same method.
+
+            return character;
         }
 
         public async Task<List<Character>> GetAllCharacters() => await _characterRepository.List.ToListAsync();
@@ -39,14 +42,25 @@ namespace Backend.BusinessLayer.Concrete
             return character;
         }
 
-        public void UpdateCharacter(Character character)
+        public async Task<bool> UpdateCharacter(Character character)
         {
-            _characterRepository.Update(character);
+
+            var existingCharacter = _characterRepository.List.FirstOrDefaultAsync(s => s.CharacterID == character.CharacterID);
+            if (existingCharacter == null)
+                return false;
+
+            await _characterRepository.Update(character);
+            return true;
         }
 
-        public void DeleteCharacter(Character character)
+        public async Task<bool> DeleteCharacter(int characterId)
         {
-            _characterRepository.Delete(character);
+            var character = await _characterRepository.List.FirstOrDefaultAsync(s => s.CharacterID == characterId);
+            if (character == null)
+                return false;
+
+            await _characterRepository.Delete(character);
+            return true;
         }
     }
 }

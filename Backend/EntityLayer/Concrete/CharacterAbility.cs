@@ -17,5 +17,7 @@ namespace Backend.EntityLayer.Concrete
         [Column(Order = 2)]
         public int AbilityID { get; set; }
         public Ability Ability { get; set; }
+        public int Value { get; set; }
+
     }
 }

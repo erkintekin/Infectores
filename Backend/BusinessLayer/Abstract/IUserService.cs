@@ -8,11 +8,11 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface IUserService
     {
-        void CreateUser(User user);
+        Task<User> CreateUser(User user);
         Task<List<User>> GetAllUsers();
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string email);
-        void UpdateUser(User user);
-        void DeleteUser(User user);
+        Task<bool> UpdateUser(User user);
+        Task<bool> DeleteUser(int userId);
     }
 }
