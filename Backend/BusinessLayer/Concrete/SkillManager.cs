@@ -26,9 +26,8 @@ namespace Backend.BusinessLayer.Concrete
             var skillExists = await _skillRepository.List.AnyAsync(i => i.Name == skill.Name && i.SkillID == skill.SkillID);
 
             if (skillExists)
-            {
                 throw new InvalidOperationException($"An skill with the name `{skill.Name}` already exists");
-            }
+
             await _skillRepository.Create(skill);
             return skill;
         }
@@ -45,9 +44,9 @@ namespace Backend.BusinessLayer.Concrete
 
         public async Task<bool> DeleteSkill(int skillId)
         {
-            var existingSkill = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skillId) ?? throw new KeyNotFoundException($"Skill with ID: `{skillId}` is not found or character has not have it.");
+            var selectedSkill = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skillId) ?? throw new KeyNotFoundException($"Skill with ID: `{skillId}` is not found or character has not have it.");
 
-            await _skillRepository.Delete(existingSkill);
+            await _skillRepository.Delete(selectedSkill);
             return true;
 
         }
