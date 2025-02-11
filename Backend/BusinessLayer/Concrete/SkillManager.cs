@@ -9,10 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.BusinessLayer.Concrete
 {
-    public class SkillManager : IRepository<ISkillService>
+    public class SkillManager : ISkillService
     {
         private readonly IRepository<Skill> _skillRepository;
         private readonly IRepository<CharacterSkill> _characterSkillRepository;
+
+        public SkillManager(IRepository<Skill> skillRepository, IRepository<CharacterSkill> characterSkillRepository)
+        {
+            _skillRepository = skillRepository;
+            _characterSkillRepository = characterSkillRepository;
+
+        }
 
         public async Task<Skill> CreateSkill(Skill skill)
         {
@@ -33,6 +40,60 @@ namespace Backend.BusinessLayer.Concrete
             _ = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skill.SkillID) ?? throw new KeyNotFoundException($"Skill with ID: `{skill.SkillID}` is not found.");
 
             await _skillRepository.Update(skill);
+            return true;
+        }
+
+        public async Task<bool> DeleteSkill(int skillId)
+        {
+            var existingSkill = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skillId) ?? throw new KeyNotFoundException($"Skill with ID: `{skillId}` is not found or character has not have it.");
+
+            await _skillRepository.Delete(existingSkill);
+            return true;
+
+        }
+
+        public async Task<List<CharacterSkill>> GetCharacterSkills(int characterId)
+        {
+            var characterExists = await _characterSkillRepository.List.AnyAsync(c => c.CharacterID == characterId);
+            if (!characterExists)
+                throw new KeyNotFoundException($"Error: No character found with ID `{characterId}`. Please check the ID.");
+
+            var characterSkills = await _characterSkillRepository.List
+                .Where(cs => cs.CharacterID == characterId)
+                .ToListAsync();
+
+            if (characterSkills.Count == 0)
+                throw new InvalidOperationException($"Character `{characterId}` exists but has no skills assigned.");
+
+            return characterSkills;
+        }
+
+        public async Task<bool> UpdateCharacterSkill(int characterId, int skillId, int newValue)
+        {
+            var characterExists = await _characterSkillRepository.List.AnyAsync(c => c.CharacterID == characterId);
+            if (!characterExists)
+                throw new KeyNotFoundException($"No character found with ID `{characterId}`. Please check the ID.");
+
+            var characterSkill = await _characterSkillRepository.List
+                .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SkillID == skillId) ?? throw new InvalidOperationException($"Character `{characterId}` exists but does not have the skill `{skillId}` assigned.");
+
+            characterSkill.Value = newValue;
+            await _characterSkillRepository.Update(characterSkill);
+
+            return true;
+        }
+
+        public async Task<bool> DeleteCharacterSkill(int characterId, int skillId)
+        {
+            var characterExists = await _characterSkillRepository.List.AnyAsync(cs => cs.CharacterID == characterId);
+            if (!characterExists)
+            {
+                throw new KeyNotFoundException($"No character found with ID `{characterId}`. Please check the ID.");
+            }
+
+            var characterSkill = await _characterSkillRepository.List.FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SkillID == skillId) ?? throw new InvalidOperationException($"Character `{characterId}` exists but does not have the skill `{skillId}` assigned.");
+
+            await _characterSkillRepository.Delete(characterSkill);
             return true;
         }
 

@@ -19,5 +19,6 @@ namespace Backend.EntityLayer.Concrete
         public int SkillID { get; set; }
         public Skill Skill { get; set; }
         public int Bonus { get; set; }
+        public int Value { get; set; }
     }
 }
