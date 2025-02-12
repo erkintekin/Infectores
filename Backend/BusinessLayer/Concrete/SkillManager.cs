@@ -77,8 +77,11 @@ namespace Backend.BusinessLayer.Concrete
                 .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SkillID == skillId) ?? throw new InvalidOperationException($"Character `{characterId}` exists but does not have the skill `{skillId}` assigned.");
 
             characterSkill.Value = newValue;
-            await _characterSkillRepository.Update(characterSkill);
 
+            if (newValue < 0)
+                throw new ArgumentOutOfRangeException(nameof(newValue), "Skill value cannot be negative.");
+
+            await _characterSkillRepository.Update(characterSkill);
             return true;
         }
 

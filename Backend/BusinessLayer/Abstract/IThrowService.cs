@@ -14,7 +14,7 @@ namespace Backend.BusinessLayer.Abstract
         Task<bool> UpdateThrow(Throw throwEntity);
         Task<bool> DeleteThrow(int throwId);
         Task<List<CharacterThrow>> GetAllCharacterThrows(int characterId);
-        Task<bool> UpdateCharacterThrow(int characterId, int skillId, int newValue);
-        Task<bool> DeleteCharacterThrow(int characterId, int skillId);
+        Task<bool> UpdateCharacterThrow(int characterId, int throwId, int newValue);
+        Task<bool> DeleteCharacterThrow(int characterId, int throwId);
     }
 }

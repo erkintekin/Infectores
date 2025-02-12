@@ -28,7 +28,7 @@ namespace Backend.BusinessLayer.Concrete
                 return false;
 
             if (newValue < 0)
-                throw new Exception("Ability score cannot be negative");
+                throw new ArgumentOutOfRangeException(nameof(newValue), "Ability value cannot be negative.");
 
             characterAbility.Value = newValue;
             await _characterAbilityRepository.Update(characterAbility);
