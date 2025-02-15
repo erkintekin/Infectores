@@ -15,7 +15,7 @@ namespace Backend.BusinessLayer.Abstract
         Task<bool> DeleteSpell(int spellId);
         Task<CharacterSpell> AddSpellCharacter(int characterId, int spellId);
         Task<List<CharacterSpell>> GetAllCharacterSpells(int characterId);
-        Task<bool> UpdateCharacterSpell(int characterId, int spellId, int newValue);
+        Task<bool> UpdateCharacterSpell(int characterId, int spellId, int newLevel);
         Task<bool> DeleteCharacterSpell(int characterId, int spellId);
     }
 }
