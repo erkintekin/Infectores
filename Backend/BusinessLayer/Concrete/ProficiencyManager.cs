@@ -13,11 +13,15 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Proficiency> _proficiencyRepository;
         private readonly IRepository<CharacterProficiency> _characterProficiencyRepository;
+        private readonly IRepository<ProficiencyTool> _proficiencyToolRepository;
+        private readonly IRepository<Tool> _toolRepository;
 
-        public ProficiencyManager(IRepository<Proficiency> proficiencyRepository, IRepository<CharacterProficiency> characterRepository)
+        public ProficiencyManager(IRepository<Proficiency> proficiencyRepository, IRepository<CharacterProficiency> characterRepository, IRepository<ProficiencyTool> proficiencyToolRepository, IRepository<Tool> toolRepository)
         {
             _proficiencyRepository = proficiencyRepository;
             _characterProficiencyRepository = characterRepository;
+            _proficiencyToolRepository = proficiencyToolRepository;
+            _toolRepository = toolRepository;
         }
 
         public async Task<Proficiency> CreateProficiency(Proficiency proficiency)
@@ -91,6 +95,39 @@ namespace Backend.BusinessLayer.Concrete
 
             await _characterProficiencyRepository.Delete(characterProficiency);
             return true;
+        }
+
+        public async Task<ProficiencyTool> AddToolToProficiency(int proficiencyId, int toolId)
+        {
+            var existingProficiency = await _proficiencyRepository.List.AnyAsync(pt => pt.ProficiencyID == proficiencyId);
+
+            if (!existingProficiency)
+            {
+                throw new KeyNotFoundException($"Proficiency with ID `{proficiencyId}` not found.");
+            }
+
+            var existingTool = await _toolRepository.List.AnyAsync(pt => pt.ToolID == toolId);
+
+            if (!existingTool)
+            {
+                throw new KeyNotFoundException($"Tool with ID `{toolId}` not found");
+            }
+
+            var existingProficiencyTool = await _proficiencyToolRepository.List.FirstOrDefaultAsync(pt => pt.ProficiencyID == proficiencyId && pt.ToolID == toolId);
+
+            if (existingProficiencyTool != null)
+            {
+                throw new InvalidOperationException($"Proficiency {proficiencyId} has Tool {toolId} already.");
+            }
+
+            var newProficiencyTool = new ProficiencyTool
+            {
+                ProficiencyID = proficiencyId,
+                ToolID = toolId
+            };
+
+            await _proficiencyToolRepository.Create(newProficiencyTool);
+            return newProficiencyTool;
         }
 
     }

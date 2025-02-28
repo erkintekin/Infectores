@@ -16,5 +16,6 @@ namespace Backend.BusinessLayer.Abstract
         Task<bool> UpdateProficiency(Proficiency proficiency);
         Task<bool> DeleteProficiency(int proficiencyId);
         Task<bool> DeleteCharacterProficiency(int characterId, int proficiencyId);
+        Task<ProficiencyTool> AddToolToProficiency(int proficiencyId, int toolId);
     }
 }

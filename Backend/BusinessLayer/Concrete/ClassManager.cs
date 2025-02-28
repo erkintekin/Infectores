@@ -25,7 +25,8 @@ namespace Backend.BusinessLayer.Concrete
         }
 
         public async Task<List<Class>> GetAllClasses() => await _classRepository.List.ToListAsync();
-        public async Task<Class> GetClassById(int id) => await _classRepository.List.FirstOrDefaultAsync(s => s.ClassID == id);
+        public async Task<Class> GetClassById(int id) => await _classRepository.List.FirstOrDefaultAsync(s => s.ClassID == id) ?? throw new KeyNotFoundException($"Class with ID: `{id}` not found.");
+    }
 
         public async Task<bool> UpdateClass(Class classEntity)
         {

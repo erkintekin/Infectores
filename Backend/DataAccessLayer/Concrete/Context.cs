@@ -94,7 +94,6 @@ namespace Backend.DataAccessLayer.Concrete
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // **One-to-One Relationship**
             modelBuilder.Entity<Character>()
                 .HasOne(c => c.Inventory)
                 .WithOne(i => i.Character)
