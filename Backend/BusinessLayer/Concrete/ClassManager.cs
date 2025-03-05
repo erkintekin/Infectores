@@ -18,42 +18,62 @@ namespace Backend.BusinessLayer.Concrete
             _mapper = mapper;
         }
 
-        public async Task<ClassDTO> CreateClassAsync(ClassDTO classDto)
+        public async Task<ClassDTO> CreateClassAsync(ClassCreateDTO classDto)
         {
+            var exists = await _classRepository.AnyAsync(c => c.Name.ToLower() == classDto.Name.ToLower());
+            if (exists)
+            {
+                throw new InvalidOperationException($"Class with name '{classDto.Name}' already exists.");
+            }
+
             var classEntity = _mapper.Map<Class>(classDto);
-            await _classRepository.Create(classEntity);
-            return _mapper.Map<ClassDTO>(classEntity);
+            await _classRepository.AddAsync(classEntity);
+            await _classRepository.SaveChangesAsync();
+
+            return await GetClassByIdAsync(classEntity.ClassID);
         }
 
         public async Task<List<ClassDTO>> GetAllClassesAsync()
         {
-            var classes = await _classRepository.List.ToListAsync();
+            var classes = await _classRepository.GetAllAsync();
             return _mapper.Map<List<ClassDTO>>(classes);
         }
 
         public async Task<ClassDTO> GetClassByIdAsync(int id)
         {
-            var classEntity = await _classRepository.List.FirstOrDefaultAsync(s => s.ClassID == id)
-                ?? throw new KeyNotFoundException($"Class with ID: `{id}` not found.");
+            var classEntity = await _classRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Class with ID {id} not found.");
             return _mapper.Map<ClassDTO>(classEntity);
         }
 
-        public async Task<bool> UpdateClassAsync(ClassDTO classDto)
+        public async Task<ClassDTO> UpdateClassAsync(int id, ClassUpdateDTO classDto)
         {
-            var classEntity = _mapper.Map<Class>(classDto);
-            _ = await _classRepository.List.FirstOrDefaultAsync(s => s.ClassID == classEntity.ClassID)
-                ?? throw new KeyNotFoundException($"Class with ID: `{classEntity.ClassID}` not found.");
+            var classEntity = await _classRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Class with ID {id} not found.");
 
-            await _classRepository.Update(classEntity);
-            return true;
+            if (classDto.Name != classEntity.Name)
+            {
+                var exists = await _classRepository.AnyAsync(c => c.Name.ToLower() == classDto.Name.ToLower());
+                if (exists)
+                {
+                    throw new InvalidOperationException($"Class with name '{classDto.Name}' already exists.");
+                }
+            }
+
+            _mapper.Map(classDto, classEntity);
+            await _classRepository.UpdateAsync(classEntity);
+            await _classRepository.SaveChangesAsync();
+
+            return await GetClassByIdAsync(id);
         }
 
-        public async Task<bool> DeleteClassAsync(int classId)
+        public async Task<bool> DeleteClassAsync(int id)
         {
-            var classEntity = await _classRepository.List.FirstOrDefaultAsync(s => s.ClassID == classId)
-                ?? throw new KeyNotFoundException($"Class with ID: `{classId}` not found.");
+            var classEntity = await _classRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Class with ID {id} not found.");
 
-            await _classRepository.Delete(classEntity);
+            await _classRepository.DeleteAsync(classEntity);
+            await _classRepository.SaveChangesAsync();
             return true;
         }
     }

@@ -14,57 +14,84 @@ namespace Backend.BusinessLayer.Concrete
     public class ItemManager : IItemService
     {
         private readonly IRepository<Item> _itemRepository;
+        private readonly IRepository<InventoryItem> _inventoryItemRepository;
         private readonly IMapper _mapper;
 
-        public ItemManager(IRepository<Item> itemRepository, IMapper mapper)
+        public ItemManager(
+            IRepository<Item> itemRepository,
+            IRepository<InventoryItem> inventoryItemRepository,
+            IMapper mapper)
         {
             _itemRepository = itemRepository;
+            _inventoryItemRepository = inventoryItemRepository;
             _mapper = mapper;
         }
 
-        public async Task<ItemDTO> CreateItemAsync(ItemDTO itemDto)
+        public async Task<ItemDTO> CreateItemAsync(ItemCreateDTO itemDto)
         {
-            var isExists = await _itemRepository.List.AnyAsync(i => i.Name == itemDto.Name);
-            if (isExists)
+            var exists = await _itemRepository.AnyAsync(i => i.Name.ToLower() == itemDto.Name.ToLower());
+            if (exists)
             {
-                throw new InvalidOperationException($"An item with the name `{itemDto.Name}` already exists");
+                throw new InvalidOperationException($"Item with name '{itemDto.Name}' already exists.");
             }
 
             var item = _mapper.Map<Item>(itemDto);
-            await _itemRepository.Create(item);
-            return _mapper.Map<ItemDTO>(item);
+            await _itemRepository.AddAsync(item);
+            await _itemRepository.SaveChangesAsync();
+
+            return await GetItemByIdAsync(item.ItemID);
         }
 
         public async Task<List<ItemDTO>> GetAllItemsAsync()
         {
-            var items = await _itemRepository.List.ToListAsync()
-                ?? throw new KeyNotFoundException("There are no Items here! Please add one at least!");
+            var items = await _itemRepository.GetAllAsync();
             return _mapper.Map<List<ItemDTO>>(items);
         }
 
-        public async Task<ItemDTO> GetItemByIdAsync(int itemId)
+        public async Task<ItemDTO> GetItemByIdAsync(int id)
         {
-            var item = await _itemRepository.List.FirstOrDefaultAsync(i => i.ItemID == itemId)
-                ?? throw new KeyNotFoundException($"Sorry, there is no item with Item ID: `{itemId}`");
+            var item = await _itemRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Item with ID {id} not found.");
             return _mapper.Map<ItemDTO>(item);
         }
 
-        public async Task<bool> UpdateItemAsync(ItemDTO itemDto)
+        public async Task<List<ItemDTO>> GetInventoryItemsAsync(int inventoryId)
         {
-            var item = _mapper.Map<Item>(itemDto);
-            _ = await _itemRepository.List.FirstOrDefaultAsync(i => i.ItemID == item.ItemID)
-                ?? throw new KeyNotFoundException($"Sorry, there is no Item with Item ID: `{item.ItemID}`"); // I tried to coalesce and simplify the expression "_" means unnamed "var" variable
+            var items = await _inventoryItemRepository.GetAllAsync(
+                ii => ii.InventoryID == inventoryId,
+                includeProperties: "Item,Item.ItemType");
 
-            await _itemRepository.Update(item);
-            return true;
+            return _mapper.Map<List<ItemDTO>>(items.Select(ii => ii.Item));
         }
 
-        public async Task<bool> DeleteItemAsync(int itemId)
+        public async Task<ItemDTO> UpdateItemAsync(int id, ItemUpdateDTO itemDto)
         {
-            var item = await _itemRepository.List.FirstOrDefaultAsync(i => i.ItemID == itemId)
-                ?? throw new KeyNotFoundException($"Sorry, there is no Item with Item ID: `{itemId}`");
+            var item = await _itemRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Item with ID {id} not found.");
 
-            await _itemRepository.Delete(item);
+            if (itemDto.Name != item.Name)
+            {
+                var exists = await _itemRepository.AnyAsync(i => i.Name.ToLower() == itemDto.Name.ToLower());
+                if (exists)
+                {
+                    throw new InvalidOperationException($"Item with name '{itemDto.Name}' already exists.");
+                }
+            }
+
+            _mapper.Map(itemDto, item);
+            await _itemRepository.UpdateAsync(item);
+            await _itemRepository.SaveChangesAsync();
+
+            return await GetItemByIdAsync(id);
+        }
+
+        public async Task<bool> DeleteItemAsync(int id)
+        {
+            var item = await _itemRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Item with ID {id} not found.");
+
+            await _itemRepository.DeleteAsync(item);
+            await _itemRepository.SaveChangesAsync();
             return true;
         }
     }

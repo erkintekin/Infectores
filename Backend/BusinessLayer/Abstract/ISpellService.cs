@@ -9,11 +9,11 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface ISpellService
     {
-        Task<SpellDTO> CreateSpellAsync(SpellDTO spellDto);
+        Task<SpellDTO> CreateSpellAsync(SpellCreateDTO spellDto);
         Task<List<SpellDTO>> GetAllSpellsAsync();
-        Task<SpellDTO> GetSpellByIdAsync(int spellId);
-        Task<bool> UpdateSpellAsync(SpellDTO spellDto);
-        Task<bool> DeleteSpellAsync(int spellId);
+        Task<SpellDTO> GetSpellByIdAsync(int id);
+        Task<SpellDTO> UpdateSpellAsync(int id, SpellUpdateDTO spellDto);
+        Task<bool> DeleteSpellAsync(int id);
         Task<CharacterSpellDTO> AddSpellToCharacterAsync(int characterId, int spellId);
         Task<List<CharacterSpellDTO>> GetAllCharacterSpellsAsync(int characterId);
         Task<bool> UpdateCharacterSpellAsync(int characterId, int spellId, int newLevel);

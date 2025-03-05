@@ -27,77 +27,86 @@ namespace Backend.BusinessLayer.Concrete
             _mapper = mapper;
         }
 
-        public async Task<SkillDTO> CreateSkillAsync(SkillDTO skillDto)
+        public async Task<SkillDTO> CreateSkillAsync(SkillCreateDTO skillDto)
         {
-            var skillExists = await _skillRepository.List.AnyAsync(i => i.Name == skillDto.Name);
-            if (skillExists)
-                throw new InvalidOperationException($"A skill with the name `{skillDto.Name}` already exists");
+            var exists = await _skillRepository.AnyAsync(s => s.Name.ToLower() == skillDto.Name.ToLower());
+            if (exists)
+            {
+                throw new InvalidOperationException($"Skill with name '{skillDto.Name}' already exists.");
+            }
 
             var skill = _mapper.Map<Skill>(skillDto);
-            await _skillRepository.Create(skill);
-            return _mapper.Map<SkillDTO>(skill);
+            await _skillRepository.AddAsync(skill);
+            await _skillRepository.SaveChangesAsync();
+
+            return await GetSkillByIdAsync(skill.SkillID);
         }
 
         public async Task<List<SkillDTO>> GetAllSkillsAsync()
         {
-            var skills = await _skillRepository.List.ToListAsync();
+            var skills = await _skillRepository.GetAllAsync(includeProperties: "Ability");
             return _mapper.Map<List<SkillDTO>>(skills);
         }
 
-        public async Task<SkillDTO> GetSkillByIdAsync(int skillId)
+        public async Task<SkillDTO> GetSkillByIdAsync(int id)
         {
-            var skill = await _skillRepository.List.FirstOrDefaultAsync(i => i.SkillID == skillId)
-                ?? throw new KeyNotFoundException($"Skill with ID: `{skillId}` is not found.");
+            var skill = await _skillRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Skill with ID {id} not found.");
             return _mapper.Map<SkillDTO>(skill);
-        }
-
-        public async Task<bool> UpdateSkillAsync(SkillDTO skillDto)
-        {
-            var skill = _mapper.Map<Skill>(skillDto);
-            _ = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skill.SkillID)
-                ?? throw new KeyNotFoundException($"Skill with ID: `{skill.SkillID}` is not found.");
-
-            await _skillRepository.Update(skill);
-            return true;
-        }
-
-        public async Task<bool> DeleteSkillAsync(int skillId)
-        {
-            var skill = await _skillRepository.List.FirstOrDefaultAsync(s => s.SkillID == skillId)
-                ?? throw new KeyNotFoundException($"Skill with ID: `{skillId}` is not found.");
-
-            await _skillRepository.Delete(skill);
-            return true;
         }
 
         public async Task<List<CharacterSkillDTO>> GetCharacterSkillsAsync(int characterId)
         {
-            var characterSkills = await _characterSkillRepository.List
-                .Where(cs => cs.CharacterID == characterId)
-                .ToListAsync();
+            var skills = await _characterSkillRepository.GetAllAsync(
+                cs => cs.CharacterID == characterId,
+                includeProperties: "Skill,Skill.Ability");
 
-            return _mapper.Map<List<CharacterSkillDTO>>(characterSkills);
+            return _mapper.Map<List<CharacterSkillDTO>>(skills);
         }
 
-        public async Task<bool> UpdateCharacterSkillAsync(int characterId, int skillId, int newValue)
+        public async Task<SkillDTO> UpdateSkillAsync(int id, SkillUpdateDTO skillDto)
         {
-            var characterSkill = await _characterSkillRepository.List
-                .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SkillID == skillId)
-                ?? throw new KeyNotFoundException($"Character skill not found.");
+            var skill = await _skillRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Skill with ID {id} not found.");
 
-            characterSkill.Value = newValue;
-            await _characterSkillRepository.Update(characterSkill);
+            if (skillDto.Name != skill.Name)
+            {
+                var exists = await _skillRepository.AnyAsync(s => s.Name.ToLower() == skillDto.Name.ToLower());
+                if (exists)
+                {
+                    throw new InvalidOperationException($"Skill with name '{skillDto.Name}' already exists.");
+                }
+            }
+
+            _mapper.Map(skillDto, skill);
+            await _skillRepository.UpdateAsync(skill);
+            await _skillRepository.SaveChangesAsync();
+
+            return await GetSkillByIdAsync(id);
+        }
+
+        public async Task<bool> DeleteSkillAsync(int id)
+        {
+            var skill = await _skillRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Skill with ID {id} not found.");
+
+            await _skillRepository.DeleteAsync(skill);
+            await _skillRepository.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> DeleteCharacterSkillAsync(int characterId, int skillId)
+        public async Task<CharacterSkillDTO> UpdateCharacterSkillProficiencyAsync(int characterId, int skillId, bool isProficient)
         {
-            var characterSkill = await _characterSkillRepository.List
-                .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SkillID == skillId)
-                ?? throw new KeyNotFoundException($"Character skill not found.");
+            var characterSkill = await _characterSkillRepository.GetFirstOrDefaultAsync(
+                cs => cs.CharacterID == characterId && cs.SkillID == skillId,
+                includeProperties: "Skill,Skill.Ability")
+                ?? throw new KeyNotFoundException("Character skill not found.");
 
-            await _characterSkillRepository.Delete(characterSkill);
-            return true;
+            characterSkill.IsProficient = isProficient;
+            await _characterSkillRepository.UpdateAsync(characterSkill);
+            await _characterSkillRepository.SaveChangesAsync();
+
+            return _mapper.Map<CharacterSkillDTO>(characterSkill);
         }
     }
 }

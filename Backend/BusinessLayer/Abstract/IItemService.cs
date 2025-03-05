@@ -9,10 +9,11 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface IItemService
     {
-        Task<ItemDTO> CreateItemAsync(ItemDTO itemDto);
+        Task<ItemDTO> CreateItemAsync(ItemCreateDTO itemDto);
         Task<List<ItemDTO>> GetAllItemsAsync();
-        Task<ItemDTO> GetItemByIdAsync(int itemId);
-        Task<bool> UpdateItemAsync(ItemDTO itemDto);
-        Task<bool> DeleteItemAsync(int itemId);
+        Task<ItemDTO> GetItemByIdAsync(int id);
+        Task<List<ItemDTO>> GetInventoryItemsAsync(int inventoryId);
+        Task<ItemDTO> UpdateItemAsync(int id, ItemUpdateDTO itemDto);
+        Task<bool> DeleteItemAsync(int id);
     }
 }

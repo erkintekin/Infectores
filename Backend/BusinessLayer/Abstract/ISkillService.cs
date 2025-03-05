@@ -9,13 +9,12 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface ISkillService
     {
-        Task<SkillDTO> CreateSkillAsync(SkillDTO skillDto);
+        Task<SkillDTO> CreateSkillAsync(SkillCreateDTO skillDto);
         Task<List<SkillDTO>> GetAllSkillsAsync();
-        Task<SkillDTO> GetSkillByIdAsync(int skillId);
-        Task<bool> UpdateSkillAsync(SkillDTO skillDto);
-        Task<bool> DeleteSkillAsync(int skillId);
+        Task<SkillDTO> GetSkillByIdAsync(int id);
         Task<List<CharacterSkillDTO>> GetCharacterSkillsAsync(int characterId);
-        Task<bool> UpdateCharacterSkillAsync(int characterId, int skillId, int newValue);
-        Task<bool> DeleteCharacterSkillAsync(int characterId, int skillId);
+        Task<SkillDTO> UpdateSkillAsync(int id, SkillUpdateDTO skillDto);
+        Task<bool> DeleteSkillAsync(int id);
+        Task<CharacterSkillDTO> UpdateCharacterSkillProficiencyAsync(int characterId, int skillId, bool isProficient);
     }
 }

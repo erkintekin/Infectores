@@ -27,47 +27,75 @@ namespace Backend.BusinessLayer.Concrete
             _mapper = mapper;
         }
 
-        public async Task<SpellDTO> CreateSpellAsync(SpellDTO spellDto)
+        public async Task<SpellDTO> CreateSpellAsync(SpellCreateDTO spellDto)
         {
+            var exists = await _spellRepository.AnyAsync(s => s.Name.ToLower() == spellDto.Name.ToLower());
+            if (exists)
+            {
+                throw new InvalidOperationException($"Spell with name '{spellDto.Name}' already exists.");
+            }
+
             var spell = _mapper.Map<Spell>(spellDto);
-            await _spellRepository.Create(spell);
-            return _mapper.Map<SpellDTO>(spell);
+            await _spellRepository.AddAsync(spell);
+            await _spellRepository.SaveChangesAsync();
+
+            return await GetSpellByIdAsync(spell.SpellID);
         }
 
         public async Task<List<SpellDTO>> GetAllSpellsAsync()
         {
-            var spells = await _spellRepository.List.ToListAsync();
+            var spells = await _spellRepository.GetAllAsync();
             return _mapper.Map<List<SpellDTO>>(spells);
         }
 
-        public async Task<SpellDTO> GetSpellByIdAsync(int spellId)
+        public async Task<SpellDTO> GetSpellByIdAsync(int id)
         {
-            var spell = await _spellRepository.List.FirstOrDefaultAsync(s => s.SpellID == spellId)
-                ?? throw new KeyNotFoundException($"Spell with ID: {spellId} not found.");
+            var spell = await _spellRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Spell with ID {id} not found.");
             return _mapper.Map<SpellDTO>(spell);
         }
 
-        public async Task<bool> UpdateSpellAsync(SpellDTO spellDto)
+        public async Task<SpellDTO> UpdateSpellAsync(int id, SpellUpdateDTO spellDto)
         {
-            var spell = _mapper.Map<Spell>(spellDto);
-            _ = await _spellRepository.List.FirstOrDefaultAsync(s => s.SpellID == spell.SpellID)
-                ?? throw new KeyNotFoundException($"Spell with ID: {spell.SpellID} not found.");
+            var spell = await _spellRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Spell with ID {id} not found.");
 
-            await _spellRepository.Update(spell);
-            return true;
+            if (spellDto.Name != spell.Name)
+            {
+                var exists = await _spellRepository.AnyAsync(s => s.Name.ToLower() == spellDto.Name.ToLower());
+                if (exists)
+                {
+                    throw new InvalidOperationException($"Spell with name '{spellDto.Name}' already exists.");
+                }
+            }
+
+            _mapper.Map(spellDto, spell);
+            await _spellRepository.UpdateAsync(spell);
+            await _spellRepository.SaveChangesAsync();
+
+            return await GetSpellByIdAsync(id);
         }
 
-        public async Task<bool> DeleteSpellAsync(int spellId)
+        public async Task<bool> DeleteSpellAsync(int id)
         {
-            var spell = await _spellRepository.List.FirstOrDefaultAsync(s => s.SpellID == spellId)
-                ?? throw new KeyNotFoundException($"Spell with ID: {spellId} not found.");
+            var spell = await _spellRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Spell with ID {id} not found.");
 
-            await _spellRepository.Delete(spell);
+            await _spellRepository.DeleteAsync(spell);
+            await _spellRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<CharacterSpellDTO> AddSpellToCharacterAsync(int characterId, int spellId)
         {
+            var exists = await _characterSpellRepository.AnyAsync(
+                cs => cs.CharacterID == characterId && cs.SpellID == spellId);
+
+            if (exists)
+            {
+                throw new InvalidOperationException("Character already has this spell.");
+            }
+
             var characterSpell = new CharacterSpell
             {
                 CharacterID = characterId,
@@ -75,37 +103,40 @@ namespace Backend.BusinessLayer.Concrete
                 Level = 1
             };
 
-            await _characterSpellRepository.Create(characterSpell);
+            await _characterSpellRepository.AddAsync(characterSpell);
+            await _characterSpellRepository.SaveChangesAsync();
+
             return _mapper.Map<CharacterSpellDTO>(characterSpell);
         }
 
         public async Task<List<CharacterSpellDTO>> GetAllCharacterSpellsAsync(int characterId)
         {
-            var spells = await _characterSpellRepository.List
-                .Where(cs => cs.CharacterID == characterId)
-                .ToListAsync();
+            var spells = await _characterSpellRepository.GetAllAsync(
+                cs => cs.CharacterID == characterId);
 
             return _mapper.Map<List<CharacterSpellDTO>>(spells);
         }
 
         public async Task<bool> UpdateCharacterSpellAsync(int characterId, int spellId, int newLevel)
         {
-            var characterSpell = await _characterSpellRepository.List
-                .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SpellID == spellId)
-                ?? throw new KeyNotFoundException($"Character spell not found.");
+            var characterSpell = await _characterSpellRepository.GetFirstOrDefaultAsync(
+                cs => cs.CharacterID == characterId && cs.SpellID == spellId)
+                ?? throw new KeyNotFoundException("Character spell not found.");
 
             characterSpell.Level = newLevel;
-            await _characterSpellRepository.Update(characterSpell);
+            await _characterSpellRepository.UpdateAsync(characterSpell);
+            await _characterSpellRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteCharacterSpellAsync(int characterId, int spellId)
         {
-            var characterSpell = await _characterSpellRepository.List
-                .FirstOrDefaultAsync(cs => cs.CharacterID == characterId && cs.SpellID == spellId)
-                ?? throw new KeyNotFoundException($"Character spell not found.");
+            var characterSpell = await _characterSpellRepository.GetFirstOrDefaultAsync(
+                cs => cs.CharacterID == characterId && cs.SpellID == spellId)
+                ?? throw new KeyNotFoundException("Character spell not found.");
 
-            await _characterSpellRepository.Delete(characterSpell);
+            await _characterSpellRepository.DeleteAsync(characterSpell);
+            await _characterSpellRepository.SaveChangesAsync();
             return true;
         }
     }

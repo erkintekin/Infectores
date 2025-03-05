@@ -9,11 +9,11 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface IUserService
     {
-        Task<UserDTO> CreateUserAsync(UserDTO userDto);
+        Task<UserDTO> CreateUserAsync(UserCreateDTO userDto);
         Task<List<UserDTO>> GetAllUsersAsync();
         Task<UserDTO> GetUserByIdAsync(int id);
         Task<UserDTO> GetUserByEmailAsync(string email);
-        Task<bool> UpdateUserAsync(UserDTO userDto);
-        Task<bool> DeleteUserAsync(int userId);
+        Task<UserDTO> UpdateUserAsync(int id, UserUpdateDTO userDto);
+        Task<bool> DeleteUserAsync(int id);
     }
 }

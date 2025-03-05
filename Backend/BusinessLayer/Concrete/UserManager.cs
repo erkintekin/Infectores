@@ -23,49 +23,71 @@ namespace Backend.BusinessLayer.Concrete
             _mapper = mapper;
         }
 
-        public async Task<UserDTO> CreateUserAsync(UserDTO userDto)
+        public async Task<UserDTO> CreateUserAsync(UserCreateDTO userDto)
         {
+            var exists = await _userRepository.AnyAsync(u => u.Email.ToLower() == userDto.Email.ToLower());
+            if (exists)
+            {
+                throw new InvalidOperationException($"User with email '{userDto.Email}' already exists.");
+            }
+
             var user = _mapper.Map<User>(userDto);
-            await _userRepository.Create(user);
+            // Burada şifre hash'leme işlemi yapılmalı
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
+
             return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<List<UserDTO>> GetAllUsersAsync()
         {
-            var users = await _userRepository.List.ToListAsync();
+            var users = await _userRepository.GetAllAsync();
             return _mapper.Map<List<UserDTO>>(users);
         }
 
         public async Task<UserDTO> GetUserByIdAsync(int id)
         {
-            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == id)
+            var user = await _userRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"User with ID {id} not found.");
             return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<UserDTO> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.Mail == email)
-                ?? throw new KeyNotFoundException($"User with e-Mail {email} not found.");
+            var user = await _userRepository.GetFirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower())
+                ?? throw new KeyNotFoundException($"User with email {email} not found.");
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<bool> UpdateUserAsync(UserDTO userDto)
+        public async Task<UserDTO> UpdateUserAsync(int id, UserUpdateDTO userDto)
         {
-            var user = _mapper.Map<User>(userDto);
-            _ = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == user.UserID)
-                ?? throw new KeyNotFoundException($"User with ID {user.UserID} not found.");
+            var user = await _userRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"User with ID {id} not found.");
 
-            await _userRepository.Update(user);
-            return true;
+            if (userDto.Email != user.Email)
+            {
+                var exists = await _userRepository.AnyAsync(u => u.Email.ToLower() == userDto.Email.ToLower());
+                if (exists)
+                {
+                    throw new InvalidOperationException($"User with email '{userDto.Email}' already exists.");
+                }
+            }
+
+            // Burada şifre doğrulama ve yeni şifre hash'leme işlemleri yapılmalı
+            _mapper.Map(userDto, user);
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> DeleteUserAsync(int id)
         {
-            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == userId)
-                ?? throw new KeyNotFoundException($"User with ID {userId} not found.");
+            var user = await _userRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"User with ID {id} not found.");
 
-            await _userRepository.Delete(user);
+            await _userRepository.DeleteAsync(user);
+            await _userRepository.SaveChangesAsync();
             return true;
         }
     }

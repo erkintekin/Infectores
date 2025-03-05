@@ -9,10 +9,10 @@ namespace Backend.BusinessLayer.Abstract
 {
     public interface IClassService
     {
-        Task<ClassDTO> CreateClassAsync(ClassDTO classDto);
+        Task<ClassDTO> CreateClassAsync(ClassCreateDTO classDto);
         Task<List<ClassDTO>> GetAllClassesAsync();
         Task<ClassDTO> GetClassByIdAsync(int id);
-        Task<bool> UpdateClassAsync(ClassDTO classDto);
-        Task<bool> DeleteClassAsync(int classId);
+        Task<ClassDTO> UpdateClassAsync(int id, ClassUpdateDTO classDto);
+        Task<bool> DeleteClassAsync(int id);
     }
 }

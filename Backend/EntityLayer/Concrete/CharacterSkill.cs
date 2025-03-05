@@ -20,5 +20,6 @@ namespace Backend.EntityLayer.Concrete
         public Skill Skill { get; set; }
         public int Bonus { get; set; }
         public int Value { get; set; }
+        public bool IsProficient { get; set; }
     }
 }

@@ -29,56 +29,49 @@ namespace Backend.BusinessLayer.Concrete
 
         public async Task<AbilityDTO> CreateAbilityAsync(AbilityCreateDTO abilityDto)
         {
-            var exists = await _abilityRepository.List
-                .AnyAsync(a => a.AbilityName.ToLower() == abilityDto.AbilityName.ToLower());
-
+            var exists = await _abilityRepository.AnyAsync(a => a.AbilityName.ToLower() == abilityDto.AbilityName.ToLower());
             if (exists)
             {
                 throw new InvalidOperationException($"Ability with name '{abilityDto.AbilityName}' already exists.");
             }
 
             var ability = _mapper.Map<Ability>(abilityDto);
-            await _abilityRepository.Create(ability);
+            await _abilityRepository.AddAsync(ability);
+            await _abilityRepository.SaveChangesAsync();
 
             return await GetAbilityByIdAsync(ability.AbilityID);
         }
 
         public async Task<List<AbilityDTO>> GetAllAbilitiesAsync()
         {
-            var abilities = await _abilityRepository.List.ToListAsync();
+            var abilities = await _abilityRepository.GetAllAsync();
             return _mapper.Map<List<AbilityDTO>>(abilities);
         }
 
         public async Task<AbilityDTO> GetAbilityByIdAsync(int id)
         {
-            var ability = await _abilityRepository.List
-                .FirstOrDefaultAsync(a => a.AbilityID == id)
+            var ability = await _abilityRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"Ability with ID {id} not found.");
-
             return _mapper.Map<AbilityDTO>(ability);
         }
 
         public async Task<List<CharacterAbilityDTO>> GetCharacterAbilitiesAsync(int characterId)
         {
-            var abilities = await _characterAbilityRepository.List
-                .Include(ca => ca.Ability)
-                .Where(ca => ca.CharacterID == characterId)
-                .ToListAsync();
+            var abilities = await _characterAbilityRepository.GetAllAsync(
+                ca => ca.CharacterID == characterId,
+                includeProperties: "Ability");
 
             return _mapper.Map<List<CharacterAbilityDTO>>(abilities);
         }
 
         public async Task<AbilityDTO> UpdateAbilityAsync(int id, AbilityUpdateDTO abilityDto)
         {
-            var ability = await _abilityRepository.List
-                .FirstOrDefaultAsync(a => a.AbilityID == id)
+            var ability = await _abilityRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"Ability with ID {id} not found.");
 
             if (abilityDto.AbilityName != ability.AbilityName)
             {
-                var exists = await _abilityRepository.List
-                    .AnyAsync(a => a.AbilityName.ToLower() == abilityDto.AbilityName.ToLower());
-
+                var exists = await _abilityRepository.AnyAsync(a => a.AbilityName.ToLower() == abilityDto.AbilityName.ToLower());
                 if (exists)
                 {
                     throw new InvalidOperationException($"Ability with name '{abilityDto.AbilityName}' already exists.");
@@ -86,30 +79,32 @@ namespace Backend.BusinessLayer.Concrete
             }
 
             _mapper.Map(abilityDto, ability);
-            await _abilityRepository.Update(ability);
+            await _abilityRepository.UpdateAsync(ability);
+            await _abilityRepository.SaveChangesAsync();
 
             return await GetAbilityByIdAsync(id);
         }
 
         public async Task<bool> DeleteAbilityAsync(int id)
         {
-            var ability = await _abilityRepository.List
-                .FirstOrDefaultAsync(a => a.AbilityID == id)
+            var ability = await _abilityRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"Ability with ID {id} not found.");
 
-            await _abilityRepository.Delete(ability);
+            await _abilityRepository.DeleteAsync(ability);
+            await _abilityRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<CharacterAbilityDTO> UpdateCharacterAbilityValueAsync(int characterId, int abilityId, int value)
         {
-            var characterAbility = await _characterAbilityRepository.List
-                .Include(ca => ca.Ability)
-                .FirstOrDefaultAsync(ca => ca.CharacterID == characterId && ca.AbilityID == abilityId)
+            var characterAbility = await _characterAbilityRepository.GetFirstOrDefaultAsync(
+                ca => ca.CharacterID == characterId && ca.AbilityID == abilityId,
+                includeProperties: "Ability")
                 ?? throw new KeyNotFoundException("Character ability not found.");
 
             characterAbility.Value = value;
-            await _characterAbilityRepository.Update(characterAbility);
+            await _characterAbilityRepository.UpdateAsync(characterAbility);
+            await _characterAbilityRepository.SaveChangesAsync();
 
             return _mapper.Map<CharacterAbilityDTO>(characterAbility);
         }
