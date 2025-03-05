@@ -91,6 +91,8 @@ namespace Backend.DataAccessLayer.Concrete
         public DbSet<CharacterThrow> CharacterThrows { get; set; }
         public DbSet<SpellComponent> SpellComponents { get; set; }
         public DbSet<InventoryItem> InventoryItems { get; set; }
+        public DbSet<CharacterBonusAction> CharacterBonusActions { get; set; }
+        public DbSet<CharacterLanguage> CharacterLanguages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -208,6 +210,31 @@ namespace Backend.DataAccessLayer.Concrete
 
             modelBuilder.Entity<Class>()
                 .HasData(new Class { ClassID = 1, HitDice = "1d8", Name = "Wizard", ProficiencyID = 1, Speed = 30 });
+
+            modelBuilder.Entity<CharacterBonusAction>()
+                .HasOne(cba => cba.Character)
+                .WithMany(c => c.BonusActions)
+                .HasForeignKey(cba => cba.CharacterID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BonusAction>()
+                .HasMany<CharacterBonusAction>()
+                .WithOne(cba => cba.BonusAction)
+                .HasForeignKey(cba => cba.BonusActionID);
+
+            modelBuilder.Entity<CharacterLanguage>()
+                .HasKey(cl => new { cl.CharacterID, cl.LanguageID });
+
+            modelBuilder.Entity<CharacterLanguage>()
+                .HasOne(cl => cl.Character)
+                .WithMany(c => c.Languages)
+                .HasForeignKey(cl => cl.CharacterID);
+
+            modelBuilder.Entity<Spell>()
+                .HasOne(s => s.DamageType)
+                .WithMany()
+                .HasForeignKey(s => s.DamageTypeID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
