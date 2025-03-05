@@ -6,50 +6,99 @@ using Backend.BusinessLayer.Abstract;
 using Backend.DataAccessLayer.Abstract;
 using Backend.EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Backend.BusinessLayer.Exceptions;
+using AutoMapper;
 
 namespace Backend.BusinessLayer.Concrete
 {
     public class SenseManager : ISenseService
     {
         private readonly IRepository<Sense> _senseRepository;
+        private readonly IRepository<CharacterSenses> _characterSensesRepository;
+        private readonly IMapper _mapper;
 
-        public SenseManager(IRepository<Sense> senseRepository)
+        public SenseManager(IRepository<Sense> senseRepository, IRepository<CharacterSenses> characterSensesRepository, IMapper mapper)
         {
             _senseRepository = senseRepository;
+            _characterSensesRepository = characterSensesRepository;
+            _mapper = mapper;
         }
 
         public async Task<Sense> CreateSense(Sense sense)
         {
-            var isExists = await _senseRepository.List.AnyAsync(s => s.SenseID == sense.SenseID);
+            var addedSense = await _senseRepository.AddAsync(sense);
+            await _senseRepository.SaveChangesAsync();
+            return addedSense;
+        }
 
-            if (isExists)
-            {
-                throw new InvalidOperationException($"Sense with ID:`{sense.SenseID}` has already assigned.");
-            }
+        public async Task<List<Sense>> GetAllSenses()
+        {
+            var senses = await _senseRepository.GetAllAsync();
+            return senses.ToList();
+        }
 
-            await _senseRepository.Create(sense);
+        public async Task<Sense> GetSenseById(int senseId)
+        {
+            var sense = await _senseRepository.GetByIdAsync(senseId);
+            if (sense == null)
+                throw new NotFoundException($"Sense with ID {senseId} not found");
             return sense;
         }
 
-        public async Task<List<Sense>> GetAllSenses() => await _senseRepository.List.ToListAsync();
-
-        public async Task<Sense> GetSenseById(int senseId) => await _senseRepository.List.FirstOrDefaultAsync(s => s.SenseID == senseId) ?? throw new KeyNotFoundException($"Sense with ID: `{senseId}` not found.");
-
         public async Task<bool> UpdateSense(Sense sense)
         {
-            var existingSense = await _senseRepository.List.FirstOrDefaultAsync(s => s.SenseID == sense.SenseID) ?? throw new KeyNotFoundException($"Sense with ID:`{sense.SenseID}` not found.");
+            var existingSense = await _senseRepository.GetByIdAsync(sense.SenseID);
+            if (existingSense == null)
+                throw new NotFoundException($"Sense with ID {sense.SenseID} not found");
 
-            await _senseRepository.Update(sense);
+            await _senseRepository.UpdateAsync(sense);
+            await _senseRepository.SaveChangesAsync();
             return true;
         }
 
-
         public async Task<bool> DeleteSense(int senseId)
         {
-            var selectedSense = await _senseRepository.List.FirstOrDefaultAsync(s => s.SenseID == senseId) ?? throw new KeyNotFoundException($"Sense with ID: `{senseId}` not found.");
+            var sense = await _senseRepository.GetByIdAsync(senseId);
+            if (sense == null)
+                throw new NotFoundException($"Sense with ID {senseId} not found");
 
-            await _senseRepository.Delete(selectedSense);
+            await _senseRepository.DeleteAsync(sense);
+            await _senseRepository.SaveChangesAsync();
             return true;
+        }
+
+        // Additional methods for character senses
+        public async Task<CharacterSenses> AddSenseToCharacterAsync(int characterId, int senseId)
+        {
+            var characterSense = new CharacterSenses
+            {
+                CharacterID = characterId,
+                SenseID = senseId
+            };
+
+            var addedCharacterSense = await _characterSensesRepository.AddAsync(characterSense);
+            await _characterSensesRepository.SaveChangesAsync();
+            return addedCharacterSense;
+        }
+
+        public async Task<IEnumerable<CharacterSenses>> GetCharacterSensesAsync(int characterId)
+        {
+            var characterSenses = await _characterSensesRepository.GetAllAsync(
+                cs => cs.CharacterID == characterId,
+                includeProperties: "Sense");
+            return characterSenses;
+        }
+
+        public async Task DeleteCharacterSenseAsync(int characterId, int senseId)
+        {
+            var characterSense = await _characterSensesRepository.GetFirstOrDefaultAsync(
+                cs => cs.CharacterID == characterId && cs.SenseID == senseId);
+
+            if (characterSense == null)
+                throw new NotFoundException($"Character sense not found for Character ID {characterId} and Sense ID {senseId}");
+
+            await _characterSensesRepository.DeleteAsync(characterSense);
+            await _characterSensesRepository.SaveChangesAsync();
         }
     }
 }

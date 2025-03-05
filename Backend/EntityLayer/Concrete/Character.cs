@@ -30,7 +30,7 @@ namespace Backend.EntityLayer.Concrete
         public ICollection<CharacterSpell>? Spells { get; set; }
         public ICollection<CharacterProficiency>? Proficiencies { get; set; }
         public ICollection<CharacterFeature>? Features { get; set; }
-        public ICollection<CharacterSense>? Senses { get; set; }
+        public ICollection<CharacterSenses>? Senses { get; set; }
         public ICollection<CharacterAbility>? Abilities { get; set; }
         public ICollection<CharacterThrow>? Throws { get; set; }
         public ICollection<CharacterBonusAction>? BonusActions { get; set; }

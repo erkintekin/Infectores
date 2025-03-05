@@ -6,6 +6,8 @@ using Backend.BusinessLayer.Abstract;
 using Backend.DataAccessLayer.Abstract;
 using Backend.EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Backend.BusinessLayer.Exceptions;
+using AutoMapper;
 
 namespace Backend.BusinessLayer.Concrete
 {
@@ -13,91 +15,105 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Throw> _throwRepository;
         private readonly IRepository<CharacterThrow> _characterThrowRepository;
+        private readonly IMapper _mapper;
 
-        public ThrowManager(IRepository<Throw> throwRepository, IRepository<CharacterThrow> characterThrowRepository)
+        public ThrowManager(IRepository<Throw> throwRepository, IRepository<CharacterThrow> characterThrowRepository, IMapper mapper)
         {
             _throwRepository = throwRepository;
             _characterThrowRepository = characterThrowRepository;
+            _mapper = mapper;
         }
 
         public async Task<Throw> CreateThrow(Throw throwEntity)
         {
-            var throwExists = await _throwRepository.List
-                .AnyAsync(t => t.Modifier == throwEntity.Modifier || t.ThrowID == throwEntity.ThrowID);
+            var addedThrow = await _throwRepository.AddAsync(throwEntity);
+            await _throwRepository.SaveChangesAsync();
+            return addedThrow;
+        }
 
-            if (throwExists)
-                throw new InvalidOperationException($"A throw with the name `{throwEntity.Modifier}` or ID `{throwEntity.ThrowID}` already exists.");
+        public async Task<List<Throw>> GetAllThrows()
+        {
+            var throws = await _throwRepository.GetAllAsync();
+            return throws.ToList();
+        }
 
-            await _throwRepository.Create(throwEntity);
+        public async Task<Throw> GetThrowById(int throwId)
+        {
+            var throwEntity = await _throwRepository.GetByIdAsync(throwId);
+            if (throwEntity == null)
+                throw new NotFoundException($"Throw with ID {throwId} not found");
             return throwEntity;
         }
 
-
-        public async Task<List<Throw>> GetAllThrows() => await _throwRepository.List.ToListAsync();
-
-        public async Task<Throw> GetThrowById(int throwId) => await _throwRepository.List.FirstOrDefaultAsync(t => t.ThrowID == throwId) ?? throw new KeyNotFoundException($"Throw with ID: `{throwId}` is not found.");
-
         public async Task<bool> UpdateThrow(Throw throwEntity)
         {
-            _ = await _throwRepository.List.FirstOrDefaultAsync(t => t.ThrowID == throwEntity.ThrowID) ?? throw new KeyNotFoundException($"Throw with ID: `{throwEntity.ThrowID}` is not found.");
+            var existingThrow = await _throwRepository.GetByIdAsync(throwEntity.ThrowID);
+            if (existingThrow == null)
+                throw new NotFoundException($"Throw with ID {throwEntity.ThrowID} not found");
 
-            await _throwRepository.Update(throwEntity);
+            await _throwRepository.UpdateAsync(throwEntity);
+            await _throwRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteThrow(int throwId)
         {
-            var selectedThrow = await _throwRepository.List.FirstOrDefaultAsync(t => t.ThrowID == throwId) ?? throw new KeyNotFoundException($"Throw with ID: `{throwId}` is not found.");
+            var throwEntity = await _throwRepository.GetByIdAsync(throwId);
+            if (throwEntity == null)
+                throw new NotFoundException($"Throw with ID {throwId} not found");
 
-            await _throwRepository.Delete(selectedThrow);
+            await _throwRepository.DeleteAsync(throwEntity);
+            await _throwRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<List<CharacterThrow>> GetAllCharacterThrows(int characterId)
         {
-            var characterExists = await _characterThrowRepository.List.AnyAsync(c => c.CharacterID == characterId);
-
-            if (!characterExists)
-                throw new KeyNotFoundException($"Error: No character found with ID `{characterId}`. Please check the ID.");
-
-            var characterThrows = await _characterThrowRepository.List.Where(ct => ct.CharacterID == characterId).ToListAsync();
-
-            if (characterThrows.Count == 0)
-                throw new InvalidOperationException($"Character `{characterId}` exists but has no throws assigned.");
-
-            return characterThrows;
+            var characterThrows = await _characterThrowRepository.GetAllAsync(
+                ct => ct.CharacterID == characterId,
+                includeProperties: "Throw");
+            return characterThrows.ToList();
         }
 
         public async Task<bool> UpdateCharacterThrow(int characterId, int throwId, int newValue)
         {
-            var characterExists = await _characterThrowRepository.List.AnyAsync(c => c.CharacterID == characterId);
+            var characterThrow = await _characterThrowRepository.GetFirstOrDefaultAsync(
+                ct => ct.CharacterID == characterId && ct.ThrowID == throwId);
 
-            if (!characterExists)
-                throw new KeyNotFoundException($"Error: No character found with ID `{characterId}`. Please check the ID.");
+            if (characterThrow == null)
+                throw new NotFoundException($"Character throw not found for Character ID {characterId} and Throw ID {throwId}");
 
-            var characterThrow = await _characterThrowRepository.List.FirstOrDefaultAsync(ct => ct.CharacterID == characterId && ct.ThrowID == throwId) ?? throw new InvalidOperationException($"Character `{characterId}` exists but does not have the throw `{throwId}` assigned.");
-
-            characterThrow.Value = newValue;
-
-            if (newValue < 0)
-                throw new ArgumentOutOfRangeException(nameof(newValue), "Throw value cannot be negative.");
-
-            await _characterThrowRepository.Update(characterThrow);
+            characterThrow.BonusValue = newValue;
+            await _characterThrowRepository.UpdateAsync(characterThrow);
+            await _characterThrowRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteCharacterThrow(int characterId, int throwId)
         {
-            var characterExists = await _characterThrowRepository.List.AnyAsync(c => c.CharacterID == characterId);
-            if (!characterExists)
-                throw new KeyNotFoundException($"Error: No character found with ID `{characterId}`. Please check the ID.");
+            var characterThrow = await _characterThrowRepository.GetFirstOrDefaultAsync(
+                ct => ct.CharacterID == characterId && ct.ThrowID == throwId);
 
-            var characterThrow = await _characterThrowRepository.List.FirstOrDefaultAsync(ct => ct.CharacterID == characterId && ct.ThrowID == throwId) ?? throw new InvalidOperationException($"Character `{characterId}` exists but does not have the skill `{throwId}` assigned.");
+            if (characterThrow == null)
+                throw new NotFoundException($"Character throw not found for Character ID {characterId} and Throw ID {throwId}");
 
-            await _characterThrowRepository.Delete(characterThrow);
+            await _characterThrowRepository.DeleteAsync(characterThrow);
+            await _characterThrowRepository.SaveChangesAsync();
             return true;
-
         }
 
+        // Additional methods for character throws
+        public async Task<CharacterThrow> AddThrowToCharacterAsync(int characterId, int throwId)
+        {
+            var characterThrow = new CharacterThrow
+            {
+                CharacterID = characterId,
+                ThrowID = throwId
+            };
+
+            var addedCharacterThrow = await _characterThrowRepository.AddAsync(characterThrow);
+            await _characterThrowRepository.SaveChangesAsync();
+            return addedCharacterThrow;
+        }
     }
 }

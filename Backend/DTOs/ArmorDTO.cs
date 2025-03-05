@@ -11,6 +11,8 @@ namespace Backend.DTOs
         public float Cost { get; set; }
         public bool StealthDisadvantage { get; set; }
         public int StrengthRequirement { get; set; }
+        public int BaseAC { get; set; }
+        public int DexterityModifier { get; set; }
     }
 
     public class ArmorCreateDTO
@@ -23,6 +25,8 @@ namespace Backend.DTOs
         public float Cost { get; set; }
         public bool StealthDisadvantage { get; set; }
         public int StrengthRequirement { get; set; }
+        public int BaseAC { get; set; }
+        public int DexterityModifier { get; set; }
     }
 
     public class ArmorUpdateDTO
@@ -35,5 +39,7 @@ namespace Backend.DTOs
         public float Cost { get; set; }
         public bool StealthDisadvantage { get; set; }
         public int StrengthRequirement { get; set; }
+        public int BaseAC { get; set; }
+        public int DexterityModifier { get; set; }
     }
 }

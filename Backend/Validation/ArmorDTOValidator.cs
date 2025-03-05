@@ -8,8 +8,15 @@ namespace Backend.Validation
         public ArmorDTOValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Zırh ismi boş olamaz.");
+                .NotEmpty().WithMessage("Armor name is required")
+                .MaximumLength(50).WithMessage("Armor name cannot exceed 50 characters");
+
+            RuleFor(x => x.Description)
+                .NotEmpty().WithMessage("Description is required")
+                .MaximumLength(500).WithMessage("Description cannot exceed 500 characters");
+
+            RuleFor(x => x.ArmorType)
+                .NotEmpty().WithMessage("Armor type is required");
 
             RuleFor(x => x.BaseAC)
                 .GreaterThanOrEqualTo(10)

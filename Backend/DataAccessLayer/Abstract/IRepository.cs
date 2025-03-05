@@ -9,13 +9,12 @@ namespace Backend.DataAccessLayer.Abstract
 {
     public interface IRepository<T> where T : class
     {
-        DbSet<T> List { get; }
-        Task<List<T>> GetAllAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "");
-        Task<T> GetByIdAsync(int id);
-        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "");
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
+        Task<T?> GetByIdAsync(int id);
+        Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string? includeProperties = null);
         Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
-        Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
+        Task<T> AddAsync(T entity);
+        Task<T> UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
     }

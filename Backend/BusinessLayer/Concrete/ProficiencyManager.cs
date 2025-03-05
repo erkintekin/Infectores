@@ -6,6 +6,9 @@ using Backend.BusinessLayer.Abstract;
 using Backend.DataAccessLayer.Abstract;
 using Backend.EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Backend.DTOs;
+using Backend.BusinessLayer.Exceptions;
+using AutoMapper;
 
 namespace Backend.BusinessLayer.Concrete
 {
@@ -26,25 +29,43 @@ namespace Backend.BusinessLayer.Concrete
 
         public async Task<Proficiency> CreateProficiency(Proficiency proficiency)
         {
-            await _proficiencyRepository.Create(proficiency);
+            var addedProficiency = await _proficiencyRepository.AddAsync(proficiency);
+            await _proficiencyRepository.SaveChangesAsync();
+            return addedProficiency;
+        }
+
+        public async Task<List<Proficiency>> GetAllProficiencies()
+        {
+            var proficiencies = await _proficiencyRepository.GetAllAsync();
+            return proficiencies.ToList();
+        }
+
+        public async Task<Proficiency> GetProficiencyById(int proficiencyId)
+        {
+            var proficiency = await _proficiencyRepository.GetByIdAsync(proficiencyId);
+            if (proficiency == null)
+                throw new KeyNotFoundException($"Proficiency with ID {proficiencyId} not found.");
             return proficiency;
         }
 
-        public async Task<List<Proficiency>> GetAllProficiencies() => await _proficiencyRepository.List.ToListAsync();
-        public async Task<Proficiency> GetProficiencyById(int proficiencyId) => await _proficiencyRepository.List.FirstOrDefaultAsync(s => s.ProficiencyID == proficiencyId) ?? throw new KeyNotFoundException($"Proficiency with ID {proficiencyId} not found.");
-        public async Task<List<CharacterProficiency>> GetAllCharProficiencies(int charId) => await _characterProficiencyRepository.List.Where(s => s.CharacterID == charId).ToListAsync();
+        public async Task<List<CharacterProficiency>> GetAllCharProficiencies(int charId)
+        {
+            var characterProficiencies = await _characterProficiencyRepository.GetAllAsync(s => s.CharacterID == charId);
+            return characterProficiencies.ToList();
+        }
 
         public async Task<CharacterProficiency> AddProficiencyToCharacter(int characterId, int proficiencyId)
         {
-            var existingProficiency = await _characterProficiencyRepository.List.FirstOrDefaultAsync(s => s.CharacterID == characterId && s.ProficiencyID == proficiencyId);
+            var existingProficiency = await _characterProficiencyRepository.GetFirstOrDefaultAsync(
+                s => s.CharacterID == characterId && s.ProficiencyID == proficiencyId);
 
             if (existingProficiency != null)
             {
                 throw new InvalidOperationException("Character already has this proficiency.");
             }
 
-            var existingCharacter = await _characterProficiencyRepository.List.AnyAsync(s => s.CharacterID == characterId);
-            var proficiencyExists = await _proficiencyRepository.List.AnyAsync(s => s.ProficiencyID == proficiencyId);
+            var existingCharacter = await _characterProficiencyRepository.AnyAsync(s => s.CharacterID == characterId);
+            var proficiencyExists = await _proficiencyRepository.AnyAsync(s => s.ProficiencyID == proficiencyId);
 
             if (!existingCharacter || !proficiencyExists)
             {
@@ -57,63 +78,65 @@ namespace Backend.BusinessLayer.Concrete
                 ProficiencyID = proficiencyId
             };
 
-            await _characterProficiencyRepository.Create(newCharacterProficiency);
+            await _characterProficiencyRepository.AddAsync(newCharacterProficiency);
+            await _characterProficiencyRepository.SaveChangesAsync();
 
             return newCharacterProficiency;
         }
 
         public async Task<bool> UpdateProficiency(Proficiency proficiency)
         {
-            var existingProficiency = await _proficiencyRepository.List.FirstOrDefaultAsync(s => s.ProficiencyID == proficiency.ProficiencyID);
+            var existingProficiency = await _proficiencyRepository.GetByIdAsync(proficiency.ProficiencyID);
             if (existingProficiency == null)
                 return false;
 
-            await _proficiencyRepository.Update(proficiency);
+            await _proficiencyRepository.UpdateAsync(proficiency);
+            await _proficiencyRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteProficiency(int proficiencyId)
         {
-            var existingProficiency = await _proficiencyRepository.List.FirstOrDefaultAsync(s => s.ProficiencyID == proficiencyId);
+            var existingProficiency = await _proficiencyRepository.GetByIdAsync(proficiencyId);
             if (existingProficiency == null)
                 return false;
 
-            await _proficiencyRepository.Delete(existingProficiency);
+            await _proficiencyRepository.DeleteAsync(existingProficiency);
+            await _proficiencyRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteCharacterProficiency(int characterId, int proficiencyId)
         {
-            var characterProficiency = new CharacterProficiency
-            {
-                CharacterID = characterId,
-                ProficiencyID = proficiencyId
-            };
+            var characterProficiency = await _characterProficiencyRepository.GetFirstOrDefaultAsync(
+                cp => cp.CharacterID == characterId && cp.ProficiencyID == proficiencyId);
 
             if (characterProficiency == null)
                 return false;
 
-            await _characterProficiencyRepository.Delete(characterProficiency);
+            await _characterProficiencyRepository.DeleteAsync(characterProficiency);
+            await _characterProficiencyRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<ProficiencyTool> AddToolToProficiency(int proficiencyId, int toolId)
         {
-            var existingProficiency = await _proficiencyRepository.List.AnyAsync(pt => pt.ProficiencyID == proficiencyId);
+            var existingProficiency = await _proficiencyRepository.AnyAsync(pt => pt.ProficiencyID == proficiencyId);
 
             if (!existingProficiency)
             {
                 throw new KeyNotFoundException($"Proficiency with ID `{proficiencyId}` not found.");
             }
 
-            var existingTool = await _toolRepository.List.AnyAsync(pt => pt.ToolID == toolId);
+            var existingTool = await _toolRepository.AnyAsync(pt => pt.ToolID == toolId);
 
             if (!existingTool)
             {
                 throw new KeyNotFoundException($"Tool with ID `{toolId}` not found");
             }
 
-            var existingProficiencyTool = await _proficiencyToolRepository.List.FirstOrDefaultAsync(pt => pt.ProficiencyID == proficiencyId && pt.ToolID == toolId);
+            var existingProficiencyTool = await _proficiencyToolRepository.GetFirstOrDefaultAsync(
+                pt => pt.ProficiencyID == proficiencyId && pt.ToolID == toolId);
 
             if (existingProficiencyTool != null)
             {
@@ -126,7 +149,8 @@ namespace Backend.BusinessLayer.Concrete
                 ToolID = toolId
             };
 
-            await _proficiencyToolRepository.Create(newProficiencyTool);
+            await _proficiencyToolRepository.AddAsync(newProficiencyTool);
+            await _proficiencyToolRepository.SaveChangesAsync();
             return newProficiencyTool;
         }
 

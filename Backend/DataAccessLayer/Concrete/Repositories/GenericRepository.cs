@@ -21,16 +21,18 @@ namespace Backend.DataAccessLayer.Concrete.Repositories
 
         public DbSet<T> List => _dbSet;
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "")
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet;
 
             if (filter != null)
+            {
                 query = query.Where(filter);
+            }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProperty.Trim());
                 }
@@ -39,27 +41,24 @@ namespace Backend.DataAccessLayer.Concrete.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter = null, string includeProperties = "")
+        public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet;
 
-            if (filter != null)
-                query = query.Where(filter);
-
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProperty.Trim());
                 }
             }
 
-            return await query.FirstOrDefaultAsync();
+            return await query.FirstOrDefaultAsync(filter);
         }
 
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
@@ -67,21 +66,21 @@ namespace Backend.DataAccessLayer.Concrete.Repositories
             return await _dbSet.AnyAsync(filter);
         }
 
-        public async Task AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
+            return entity;
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            return Task.CompletedTask;
+            return entity;
         }
 
-        public Task DeleteAsync(T entity)
+        public async Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
-            return Task.CompletedTask;
         }
 
         public async Task SaveChangesAsync()

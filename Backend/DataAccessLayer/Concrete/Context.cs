@@ -38,8 +38,9 @@ namespace Backend.DataAccessLayer.Concrete
 
             modelBuilder.Entity<User>()
             .HasData(
-            new User { UserID = 1, Name = "John", Surname = "Doe", Age = 25, Mail = "john.doe@example.com", Password = "hashedpassword" },
-            new User { UserID = 2, Name = "Jane", Surname = "Smith", Age = 30, Mail = "jane.smith@example.com", Password = "hashedpassword" });
+            new User { UserID = 1, Name = "Admin", Surname = "User", Email = "admin@infectores.com", PasswordHash = "admin123", IsAdmin = true },
+            new User { UserID = 2, Name = "Test", Surname = "User", Email = "test@infectores.com", PasswordHash = "test123", IsAdmin = false }
+            );
 
             modelBuilder.Entity<Character>()
             .HasData(
@@ -87,7 +88,7 @@ namespace Backend.DataAccessLayer.Concrete
         public DbSet<CharacterSpell> CharacterSpells { get; set; }
         public DbSet<CharacterProficiency> CharacterProficiencies { get; set; }
         public DbSet<CharacterAbility> CharacterAbilities { get; set; }
-        public DbSet<CharacterSense> CharacterSenses { get; set; }
+        public DbSet<CharacterSenses> CharacterSenses { get; set; }
         public DbSet<CharacterThrow> CharacterThrows { get; set; }
         public DbSet<SpellComponent> SpellComponents { get; set; }
         public DbSet<InventoryItem> InventoryItems { get; set; }
