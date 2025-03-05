@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.EntityLayer.Concrete;
+using Backend.DTOs;
 
 namespace Backend.BusinessLayer.Abstract
 {
     public interface IUserService
     {
-        Task<User> CreateUser(User user);
-        Task<List<User>> GetAllUsers();
-        Task<User> GetUserById(int id);
-        Task<User> GetUserByEmail(string email);
-        Task<bool> UpdateUser(User user);
-        Task<bool> DeleteUser(int userId);
+        Task<UserDTO> CreateUserAsync(UserDTO userDto);
+        Task<List<UserDTO>> GetAllUsersAsync();
+        Task<UserDTO> GetUserByIdAsync(int id);
+        Task<UserDTO> GetUserByEmailAsync(string email);
+        Task<bool> UpdateUserAsync(UserDTO userDto);
+        Task<bool> DeleteUserAsync(int userId);
     }
 }

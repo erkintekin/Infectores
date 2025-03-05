@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.EntityLayer.Concrete;
+using Backend.DTOs;
 
 namespace Backend.BusinessLayer.Abstract
 {
     public interface ISkillService
     {
-        Task<Skill> CreateSkill(Skill skill);
-        Task<List<Skill>> GetAllSkills();
-        Task<Skill> GetSkillById(int skillId);
-        Task<bool> UpdateSkill(Skill skill);
-        Task<bool> DeleteSkill(int skillId);
-        Task<List<CharacterSkill>> GetCharacterSkills(int characterId);
-        Task<bool> UpdateCharacterSkill(int characterId, int skillId, int newValue);
-        Task<bool> DeleteCharacterSkill(int characterId, int skillId);
-
+        Task<SkillDTO> CreateSkillAsync(SkillDTO skillDto);
+        Task<List<SkillDTO>> GetAllSkillsAsync();
+        Task<SkillDTO> GetSkillByIdAsync(int skillId);
+        Task<bool> UpdateSkillAsync(SkillDTO skillDto);
+        Task<bool> DeleteSkillAsync(int skillId);
+        Task<List<CharacterSkillDTO>> GetCharacterSkillsAsync(int characterId);
+        Task<bool> UpdateCharacterSkillAsync(int characterId, int skillId, int newValue);
+        Task<bool> DeleteCharacterSkillAsync(int characterId, int skillId);
     }
 }

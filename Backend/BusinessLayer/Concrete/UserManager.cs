@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Backend.BusinessLayer.Abstract;
 using Backend.DataAccessLayer.Abstract;
+using Backend.DTOs;
 using Backend.EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,52 +15,57 @@ namespace Backend.BusinessLayer.Concrete
     public class UserManager : IUserService
     {
         private readonly IRepository<User> _userRepository;
+        private readonly IMapper _mapper;
 
-        public UserManager(IRepository<User> userRepository)  // DI
+        public UserManager(IRepository<User> userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<UserDTO> CreateUserAsync(UserDTO userDto)
         {
+            var user = _mapper.Map<User>(userDto);
             await _userRepository.Create(user);
-            return user;
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<List<User>> GetAllUsers() => await _userRepository.List.ToListAsync();
-        public async Task<User> GetUserById(int id) => await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == id) ?? throw new KeyNotFoundException($"User with ID {id} not found.");
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<List<UserDTO>> GetAllUsersAsync()
         {
-            var existingEmail = await _userRepository.List.FirstOrDefaultAsync(s => s.Mail == email);
-
-            if (existingEmail == null)
-            {
-                throw new KeyNotFoundException($"User with e-Mail {email} not found.");
-            }
-
-            return existingEmail;
+            var users = await _userRepository.List.ToListAsync();
+            return _mapper.Map<List<UserDTO>>(users);
         }
 
-
-        public async Task<bool> UpdateUser(User user)
+        public async Task<UserDTO> GetUserByIdAsync(int id)
         {
-            var existingUser = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == id)
+                ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+            return _mapper.Map<UserDTO>(user);
+        }
 
-            if (existingUser == null)
-                return false;
+        public async Task<UserDTO> GetUserByEmailAsync(string email)
+        {
+            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.Mail == email)
+                ?? throw new KeyNotFoundException($"User with e-Mail {email} not found.");
+            return _mapper.Map<UserDTO>(user);
+        }
+
+        public async Task<bool> UpdateUserAsync(UserDTO userDto)
+        {
+            var user = _mapper.Map<User>(userDto);
+            _ = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == user.UserID)
+                ?? throw new KeyNotFoundException($"User with ID {user.UserID} not found.");
 
             await _userRepository.Update(user);
             return true;
         }
 
-        public async Task<bool> DeleteUser(int userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
-            var existingUser = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == userId);
+            var user = await _userRepository.List.FirstOrDefaultAsync(s => s.UserID == userId)
+                ?? throw new KeyNotFoundException($"User with ID {userId} not found.");
 
-            if (existingUser == null)
-                return false;
-
-            await _userRepository.Delete(existingUser);
+            await _userRepository.Delete(user);
             return true;
         }
     }

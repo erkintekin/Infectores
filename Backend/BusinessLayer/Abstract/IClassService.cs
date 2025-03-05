@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.EntityLayer.Concrete;
+using Backend.DTOs;
 
 namespace Backend.BusinessLayer.Abstract
 {
     public interface IClassService
     {
-        Task<Class> CreateClass(Class classEntity);
-        Task<List<Class>> GetAllClasses();
-        Task<Class> GetClassById(int id);
-        Task<bool> UpdateClass(Class classEntity);
-        Task<bool> DeleteClass(int characterId);
-
+        Task<ClassDTO> CreateClassAsync(ClassDTO classDto);
+        Task<List<ClassDTO>> GetAllClassesAsync();
+        Task<ClassDTO> GetClassByIdAsync(int id);
+        Task<bool> UpdateClassAsync(ClassDTO classDto);
+        Task<bool> DeleteClassAsync(int classId);
     }
 }
