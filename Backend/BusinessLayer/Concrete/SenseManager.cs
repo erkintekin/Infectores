@@ -28,6 +28,7 @@ namespace Backend.BusinessLayer.Concrete
             }
 
             await _senseRepository.Create(sense);
+            return sense;
         }
 
         public async Task<List<Sense>> GetAllSenses() => await _senseRepository.List.ToListAsync();
