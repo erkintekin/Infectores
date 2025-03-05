@@ -1,23 +1,38 @@
-using System.Collections.Generic;
-
 namespace Backend.DTOs
 {
-    public class CharacterDTO
+    public class CharacterDTO // Görüntüleme için
     {
         public int CharacterID { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
+        public string ClassName { get; set; }
+        public int Level { get; set; }
+        public int XP { get; set; }
+        public int ArmorClass { get; set; }
+        public bool IsMOB { get; set; }
+        public bool IsNPC { get; set; }
+        public List<CharacterAbilityDTO> Abilities { get; set; }
+        public List<CharacterSkillDTO> Skills { get; set; }
+        public List<CharacterSpellDTO> Spells { get; set; }
+        public InventoryDTO Inventory { get; set; }
+    }
+
+    public class CharacterCreateDTO
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
         public int UserID { get; set; }
         public int ClassID { get; set; }
-        public string ClassName { get; set; }
-        public int Level { get; set; } = 1;
-        public int XP { get; set; } = 0;
-        public int ArmorClass { get; set; } = 10;
-        public bool IsMOB { get; set; } = false;
-        public bool IsNPC { get; set; } = false;
-        public List<CharacterAbilityDTO> Abilities { get; set; } = new List<CharacterAbilityDTO>();
-        public List<CharacterSkillDTO> Skills { get; set; } = new List<CharacterSkillDTO>();
-        public List<CharacterSpellDTO> Spells { get; set; } = new List<CharacterSpellDTO>();
-        public InventoryDTO Inventory { get; set; }
+        public bool IsMOB { get; set; }
+        public bool IsNPC { get; set; }
+    }
+
+    public class CharacterUpdateDTO
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public int Level { get; set; }
+        public int XP { get; set; }
+        public int ArmorClass { get; set; }
     }
 }

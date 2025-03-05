@@ -2,11 +2,25 @@ namespace Backend.DTOs
 {
     public class CharacterSpellDTO
     {
+        public int CharacterID { get; set; }
         public int SpellID { get; set; }
-        public string Name { get; set; }
-        public int Level { get; set; }
-        public string Damage { get; set; }
-        public string DamageType { get; set; }
+        public string SpellName { get; set; }
         public string Description { get; set; }
+        public int SpellLevel { get; set; }
+        public bool IsPrepared { get; set; }
+        public int SlotsUsed { get; set; }
+    }
+
+    public class CharacterSpellCreateDTO
+    {
+        public int CharacterID { get; set; }
+        public int SpellID { get; set; }
+        public int SpellLevel { get; set; }
+    }
+
+    public class CharacterSpellUpdateDTO
+    {
+        public bool IsPrepared { get; set; }
+        public int SlotsUsed { get; set; }
     }
 }

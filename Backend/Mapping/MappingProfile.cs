@@ -8,33 +8,43 @@ namespace Backend.Mapping
     {
         public MappingProfile()
         {
+            // Character mappings
             CreateMap<Character, CharacterDTO>()
-                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
-                .ReverseMap();
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
+            CreateMap<CharacterCreateDTO, Character>();
+            CreateMap<CharacterUpdateDTO, Character>();
 
-            CreateMap<CharacterAbility, CharacterAbilityDTO>()
-                .ForMember(dest => dest.AbilityName, opt => opt.MapFrom(src => src.Ability.AbilityName))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Ability.Description))
-                .ReverseMap();
+            // Item mappings
+            CreateMap<Item, ItemDTO>()
+                .ForMember(dest => dest.ItemType, opt => opt.MapFrom(src => src.ItemType.Type));
+            CreateMap<ItemCreateDTO, Item>();
+            CreateMap<ItemUpdateDTO, Item>();
 
-            CreateMap<CharacterSkill, CharacterSkillDTO>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Skill.Name))
-                .ForMember(dest => dest.AbilityName, opt => opt.MapFrom(src => src.Skill.AbilityName))
-                .ReverseMap();
-
-            CreateMap<Inventory, InventoryDTO>().ReverseMap();
-
-            CreateMap<InventoryItem, InventoryItemDTO>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Item.Name))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Item.Description))
-                .ForMember(dest => dest.GP, opt => opt.MapFrom(src => src.Item.GP))
-                .ForMember(dest => dest.ItemType, opt => opt.MapFrom(src => src.Item.ItemType.Type))
-                .ReverseMap();
-
+            // Spell mappings
             CreateMap<Spell, SpellDTO>()
                 .ForMember(dest => dest.DamageType, opt => opt.MapFrom(src => src.DamageType.Type))
-                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.Components.Select(c => c.Component.Name)))
-                .ReverseMap();
+                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.Components.Select(c => c.Component.Name)));
+            CreateMap<SpellCreateDTO, Spell>();
+            CreateMap<SpellUpdateDTO, Spell>();
+
+            // Class mappings
+            CreateMap<Class, ClassDTO>();
+            CreateMap<ClassCreateDTO, Class>();
+            CreateMap<ClassUpdateDTO, Class>();
+
+            // User mappings
+            CreateMap<User, UserDTO>();
+            CreateMap<UserCreateDTO, User>();
+            CreateMap<UserUpdateDTO, User>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            // Existing mappings
+            CreateMap<CharacterAbility, CharacterAbilityDTO>()
+                .ForMember(dest => dest.AbilityName, opt => opt.MapFrom(src => src.Ability.AbilityName));
+            CreateMap<CharacterSkill, CharacterSkillDTO>()
+                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+            CreateMap<Inventory, InventoryDTO>();
+            CreateMap<InventoryItem, InventoryItemDTO>();
         }
     }
 }
