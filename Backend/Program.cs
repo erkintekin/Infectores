@@ -6,6 +6,9 @@ using Backend.DataAccessLayer.Concrete.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Backend.EntityLayer.Concrete;
 using AutoMapper;
+using FluentValidation.AspNetCore;
+using Backend.Validation;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,8 @@ builder.Services.AddDbContext<Context>(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddFluentValidationAutoValidation()
+    .AddValidatorsFromAssemblyContaining<CharacterDTOValidator>();
 
 var app = builder.Build();
 
