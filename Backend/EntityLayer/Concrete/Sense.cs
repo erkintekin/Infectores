@@ -10,7 +10,13 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int SenseID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int Value { get; set; }
+        public ICollection<CharacterSenses> CharacterSenses { get; set; }
+
+        public Sense()
+        {
+            CharacterSenses = new List<CharacterSenses>();
+        }
     }
 }

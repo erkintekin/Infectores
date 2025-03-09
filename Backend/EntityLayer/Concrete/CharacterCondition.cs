@@ -10,12 +10,10 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterCondition
     {
         [Key]
-        [Column(Order = 1)]
+        public int CharacterConditionID { get; set; }
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
-        [Key]
-        [Column(Order = 2)]
+        public required Character Character { get; set; }
         public int ConditionID { get; set; }
-        public Condition Condition { get; set; }
+        public required Condition Condition { get; set; }
     }
 }

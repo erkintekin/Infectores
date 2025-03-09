@@ -4,8 +4,8 @@ namespace Backend.DTOs
     {
         public int CharacterID { get; set; }
         public int SkillID { get; set; }
-        public string SkillName { get; set; }
-        public string AbilityName { get; set; }
+        public required string SkillName { get; set; }
+        public required string AbilityName { get; set; }
         public bool IsProficient { get; set; }
         public int Modifier { get; set; }
     }

@@ -9,11 +9,15 @@ namespace Backend.EntityLayer.Concrete
 {
     public class Armor
     {
-        [Key, ForeignKey("Item")]
-        public int ItemID { get; set; }
-        public Item Item { get; set; }
-        public int Defense { get; set; }
+        [Key]
+        public int ArmorID { get; set; }
+        public required Item Item { get; set; }
+        public int ArmorClass { get; set; }
         public int ArmorTypeID { get; set; }
-        public ArmorType ArmorType { get; set; }
+        public required ArmorType ArmorType { get; set; }
+        public bool StealthDisadvantage { get; set; }
+        public int? StrengthRequirement { get; set; }
+        public int BaseAC { get; set; }
+        public int? DexterityModifier { get; set; }
     }
 }

@@ -12,10 +12,10 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         [Column(Order = 1)]
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
         [Key]
         [Column(Order = 2)]
         public int FeatureID { get; set; }
-        public Feature Feature { get; set; }
+        public required Feature Feature { get; set; }
     }
 }

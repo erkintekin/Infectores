@@ -11,11 +11,17 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ItemID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int GP { get; set; }
         public string? Description { get; set; }
         public int ItemTypeID { get; set; }
-        public ItemType ItemType { get; set; }
-        public Misc Misc { get; set; }
+        public required ItemType ItemType { get; set; }
+        public Misc? Misc { get; set; }
+        public ICollection<InventoryItem> InventoryItems { get; set; }
+
+        public Item()
+        {
+            InventoryItems = new List<InventoryItem>();
+        }
     }
 }

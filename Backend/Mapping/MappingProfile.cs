@@ -10,20 +10,21 @@ namespace Backend.Mapping
         {
             // Character mappings
             CreateMap<Character, CharacterDTO>()
-                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class == null ? string.Empty : src.Class.Name));
             CreateMap<CharacterCreateDTO, Character>();
             CreateMap<CharacterUpdateDTO, Character>();
 
             // Item mappings
             CreateMap<Item, ItemDTO>()
-                .ForMember(dest => dest.ItemType, opt => opt.MapFrom(src => src.ItemType.Type));
+                .ForMember(dest => dest.ItemType, opt => opt.MapFrom(src => src.ItemType == null ? string.Empty : src.ItemType.Type));
             CreateMap<ItemCreateDTO, Item>();
             CreateMap<ItemUpdateDTO, Item>();
 
             // Spell mappings
             CreateMap<Spell, SpellDTO>()
-                .ForMember(dest => dest.DamageType, opt => opt.MapFrom(src => src.DamageType.Type))
-                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.Components.Select(c => c.Component.Name)));
+                .ForMember(dest => dest.DamageType, opt => opt.MapFrom(src => src.DamageType == null ? string.Empty : src.DamageType.Type))
+                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.Components == null ? new List<string>() :
+                    src.Components.Select(c => c.Component == null ? string.Empty : c.Component.Name).ToList()));
             CreateMap<SpellCreateDTO, Spell>();
             CreateMap<SpellUpdateDTO, Spell>();
 
@@ -40,9 +41,9 @@ namespace Backend.Mapping
 
             // Existing mappings
             CreateMap<CharacterAbility, CharacterAbilityDTO>()
-                .ForMember(dest => dest.AbilityName, opt => opt.MapFrom(src => src.Ability.AbilityName));
+                .ForMember(dest => dest.AbilityName, opt => opt.MapFrom(src => src.Ability == null ? string.Empty : src.Ability.AbilityName));
             CreateMap<CharacterSkill, CharacterSkillDTO>()
-                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill == null ? string.Empty : src.Skill.Name));
             CreateMap<Inventory, InventoryDTO>();
             CreateMap<InventoryItem, InventoryItemDTO>();
         }

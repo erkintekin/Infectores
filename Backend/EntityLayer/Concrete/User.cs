@@ -13,21 +13,27 @@ namespace Backend.EntityLayer.Concrete
         public int UserID { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        [StringLength(50)]
+        public required string Name { get; set; }
 
         [Required]
-        public string Surname { get; set; }
+        [StringLength(50)]
+        public required string Surname { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
+        public required string PasswordHash { get; set; }
 
         public bool IsAdmin { get; set; }
 
-        [Required]
-        public ICollection<Character> Characters { get; set; } = new List<Character>();
+        public ICollection<Character> Characters { get; set; }
+
+        public User()
+        {
+            Characters = new List<Character>();
+        }
     }
 }

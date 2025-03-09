@@ -10,7 +10,12 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ComponentID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public ICollection<SpellComponent> SpellComponents { get; set; }
+
+        public Component()
+        {
+            SpellComponents = new List<SpellComponent>();
+        }
     }
 }

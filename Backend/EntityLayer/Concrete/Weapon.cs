@@ -9,15 +9,15 @@ namespace Backend.EntityLayer.Concrete
 {
     public class Weapon
     {
-        [Key, ForeignKey("Item")]
-        public int ItemID { get; set; }
-        public Item Item { get; set; }
+        [Key]
+        public int WeaponID { get; set; }
+        public required Item Item { get; set; }
         public int Damage { get; set; }
         public int DamageTypeID { get; set; }
-        public DamageType DamageType { get; set; }
+        public required DamageType DamageType { get; set; }
         public int WeaponTypeID { get; set; }
-        public WeaponType WeaponType { get; set; }
-        public int Range { get; set; }
+        public required WeaponType WeaponType { get; set; }
+        public string? Range { get; set; }
         public int Weight { get; set; }
     }
 }

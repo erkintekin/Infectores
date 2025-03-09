@@ -5,12 +5,11 @@ namespace Backend.EntityLayer.Concrete
 {
     public class CharacterBonusAction
     {
-        [Key, Column(Order = 1)]
+        [Key]
+        public int CharacterBonusActionID { get; set; }
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
-
-        [Key, Column(Order = 2)]
+        public required Character Character { get; set; }
         public int BonusActionID { get; set; }
-        public BonusAction BonusAction { get; set; }
+        public required BonusAction BonusAction { get; set; }
     }
 }

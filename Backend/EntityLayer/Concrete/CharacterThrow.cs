@@ -10,6 +10,9 @@ namespace Backend.EntityLayer.Concrete
     public class CharacterThrow
     {
         [Key]
+        public int CharacterThrowID { get; set; }
+
+        [Key]
         [Column(Order = 1)]
         public int CharacterID { get; set; }
 
@@ -24,9 +27,9 @@ namespace Backend.EntityLayer.Concrete
         public int SaveDC { get; set; }
 
         [ForeignKey("CharacterID")]
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
 
         [ForeignKey("ThrowID")]
-        public Throw Throw { get; set; }
+        public required Throw Throw { get; set; }
     }
 }

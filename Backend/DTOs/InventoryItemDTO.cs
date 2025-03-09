@@ -4,9 +4,9 @@ namespace Backend.DTOs
     {
         public int InventoryID { get; set; }
         public int ItemID { get; set; }
-        public string ItemName { get; set; }
-        public string Description { get; set; }
-        public string ItemType { get; set; }
+        public required string ItemName { get; set; }
+        public required string Description { get; set; }
+        public required string ItemType { get; set; }
         public int Quantity { get; set; }
         public float Weight { get; set; }
         public float Value { get; set; }

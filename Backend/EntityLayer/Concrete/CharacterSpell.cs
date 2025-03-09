@@ -12,12 +12,12 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         [Column(Order = 1)]
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
 
         [Key]
         [Column(Order = 2)]
         public int SpellID { get; set; }
-        public Spell Spell { get; set; }
+        public required Spell Spell { get; set; }
         public int Level { get; set; }
 
     }

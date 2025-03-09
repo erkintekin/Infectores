@@ -11,11 +11,20 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ProficiencyID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public ICollection<Armor> Armors { get; set; }
         public ICollection<Weapon> Weapons { get; set; }
         public ICollection<ProficiencyTool> ProficiencyTools { get; set; }
         public ICollection<Class> Classes { get; set; }
         public ICollection<Language> Languages { get; set; }
+
+        public Proficiency()
+        {
+            Armors = new List<Armor>();
+            Weapons = new List<Weapon>();
+            ProficiencyTools = new List<ProficiencyTool>();
+            Classes = new List<Class>();
+            Languages = new List<Language>();
+        }
     }
 }

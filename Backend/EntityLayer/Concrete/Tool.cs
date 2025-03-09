@@ -10,8 +10,12 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ToolID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public ICollection<ProficiencyTool> ProficiencyTools { get; set; }
 
+        public Tool()
+        {
+            ProficiencyTools = new List<ProficiencyTool>();
+        }
     }
 }

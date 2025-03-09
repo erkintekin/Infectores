@@ -22,9 +22,9 @@ namespace Backend.EntityLayer.Concrete
         public int BonusValue { get; set; }
 
         [ForeignKey("CharacterID")]
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
 
         [ForeignKey("ProficiencyID")]
-        public Proficiency Proficiency { get; set; }
+        public required Proficiency Proficiency { get; set; }
     }
 }

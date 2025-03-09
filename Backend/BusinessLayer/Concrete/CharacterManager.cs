@@ -19,6 +19,8 @@ namespace Backend.BusinessLayer.Concrete
         private readonly IRepository<CharacterSkill> _characterSkillRepository;
         private readonly IRepository<CharacterSpell> _characterSpellRepository;
         private readonly IRepository<Inventory> _inventoryRepository;
+        private readonly IRepository<Ability> _abilityRepository;
+        private readonly IRepository<Skill> _skillRepository;
         private readonly IMapper _mapper;
 
         public CharacterManager(
@@ -27,6 +29,8 @@ namespace Backend.BusinessLayer.Concrete
             IRepository<CharacterSkill> characterSkillRepository,
             IRepository<CharacterSpell> characterSpellRepository,
             IRepository<Inventory> inventoryRepository,
+            IRepository<Ability> abilityRepository,
+            IRepository<Skill> skillRepository,
             IMapper mapper)
         {
             _characterRepository = characterRepository;
@@ -34,6 +38,8 @@ namespace Backend.BusinessLayer.Concrete
             _characterSkillRepository = characterSkillRepository;
             _characterSpellRepository = characterSpellRepository;
             _inventoryRepository = inventoryRepository;
+            _abilityRepository = abilityRepository;
+            _skillRepository = skillRepository;
             _mapper = mapper;
         }
 
@@ -51,18 +57,27 @@ namespace Backend.BusinessLayer.Concrete
             var abilities = new[] { 1, 2, 3, 4, 5, 6 }; // Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma ID'leri
             foreach (var abilityId in abilities)
             {
+                var ability = await _abilityRepository.GetByIdAsync(abilityId)
+                    ?? throw new KeyNotFoundException($"Ability with ID {abilityId} not found.");
+
                 var characterAbility = new CharacterAbility
                 {
                     CharacterID = character.CharacterID,
                     AbilityID = abilityId,
-                    Value = 10
+                    Value = 10,
+                    Character = character,
+                    Ability = ability
                 };
                 await _characterAbilityRepository.AddAsync(characterAbility);
             }
             await _characterAbilityRepository.SaveChangesAsync();
 
             // Boş envanter oluştur
-            var inventory = new Inventory { CharacterID = character.CharacterID };
+            var inventory = new Inventory
+            {
+                CharacterID = character.CharacterID,
+                Character = character
+            };
             await _inventoryRepository.AddAsync(inventory);
             await _inventoryRepository.SaveChangesAsync();
 
@@ -127,11 +142,19 @@ namespace Backend.BusinessLayer.Concrete
                 throw new InvalidOperationException("Character already has this skill.");
             }
 
+            var character = await _characterRepository.GetByIdAsync(characterId)
+                ?? throw new KeyNotFoundException($"Character with ID {characterId} not found.");
+
+            var skill = await _skillRepository.GetByIdAsync(skillId)
+                ?? throw new KeyNotFoundException($"Skill with ID {skillId} not found.");
+
             var characterSkill = new CharacterSkill
             {
                 CharacterID = characterId,
                 SkillID = skillId,
-                IsProficient = true
+                IsProficient = true,
+                Character = character,
+                Skill = skill
             };
 
             await _characterSkillRepository.AddAsync(characterSkill);

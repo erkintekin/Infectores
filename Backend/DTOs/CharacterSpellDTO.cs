@@ -4,8 +4,8 @@ namespace Backend.DTOs
     {
         public int CharacterID { get; set; }
         public int SpellID { get; set; }
-        public string SpellName { get; set; }
-        public string Description { get; set; }
+        public required string SpellName { get; set; }
+        public required string Description { get; set; }
         public int SpellLevel { get; set; }
         public bool IsPrepared { get; set; }
         public int SlotsUsed { get; set; }

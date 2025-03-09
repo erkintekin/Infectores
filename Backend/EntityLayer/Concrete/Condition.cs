@@ -11,8 +11,13 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ConditionID { get; set; }
-        [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public bool? IsActive { get; set; } = false;
+        public ICollection<CharacterCondition> CharacterConditions { get; set; }
+
+        public Condition()
+        {
+            CharacterConditions = new List<CharacterCondition>();
+        }
     }
 }

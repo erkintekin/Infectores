@@ -11,7 +11,13 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ThrowID { get; set; }
-        public string Modifier { get; set; }
+        public required string Modifier { get; set; }
+        public int Value { get; set; }
+        public ICollection<CharacterThrow> CharacterThrows { get; set; }
 
+        public Throw()
+        {
+            CharacterThrows = new List<CharacterThrow>();
+        }
     }
 }

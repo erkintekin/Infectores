@@ -19,9 +19,9 @@ namespace Backend.EntityLayer.Concrete
         public bool IsActive { get; set; }
 
         [ForeignKey("CharacterID")]
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
 
         [ForeignKey("SenseID")]
-        public Sense Sense { get; set; }
+        public required Sense Sense { get; set; }
     }
 }

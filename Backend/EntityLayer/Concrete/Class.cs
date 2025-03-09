@@ -11,11 +11,16 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ClassID { get; set; }
-        [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int Speed { get; set; }
-        public string HitDice { get; set; } // 1d8 after level 1, 1d8 + const.
+        public required string HitDice { get; set; } // 1d8 after level 1, 1d8 + const.
         public int ProficiencyID { get; set; }
         public Proficiency? Proficiency { get; set; }
+        public ICollection<Character> Characters { get; set; }
+
+        public Class()
+        {
+            Characters = new List<Character>();
+        }
     }
 }

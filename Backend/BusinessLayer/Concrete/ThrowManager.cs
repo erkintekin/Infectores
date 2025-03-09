@@ -15,12 +15,18 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Throw> _throwRepository;
         private readonly IRepository<CharacterThrow> _characterThrowRepository;
+        private readonly IRepository<Character> _characterRepository;
         private readonly IMapper _mapper;
 
-        public ThrowManager(IRepository<Throw> throwRepository, IRepository<CharacterThrow> characterThrowRepository, IMapper mapper)
+        public ThrowManager(
+            IRepository<Throw> throwRepository,
+            IRepository<CharacterThrow> characterThrowRepository,
+            IRepository<Character> characterRepository,
+            IMapper mapper)
         {
             _throwRepository = throwRepository;
             _characterThrowRepository = characterThrowRepository;
+            _characterRepository = characterRepository;
             _mapper = mapper;
         }
 
@@ -102,13 +108,20 @@ namespace Backend.BusinessLayer.Concrete
             return true;
         }
 
-        // Additional methods for character throws
         public async Task<CharacterThrow> AddThrowToCharacterAsync(int characterId, int throwId)
         {
+            var character = await _characterRepository.GetByIdAsync(characterId)
+                ?? throw new NotFoundException($"Character with ID {characterId} not found");
+
+            var throwEntity = await _throwRepository.GetByIdAsync(throwId)
+                ?? throw new NotFoundException($"Throw with ID {throwId} not found");
+
             var characterThrow = new CharacterThrow
             {
                 CharacterID = characterId,
-                ThrowID = throwId
+                ThrowID = throwId,
+                Character = character,
+                Throw = throwEntity
             };
 
             var addedCharacterThrow = await _characterThrowRepository.AddAsync(characterThrow);

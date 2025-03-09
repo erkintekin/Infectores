@@ -12,49 +12,175 @@ namespace Backend.DataAccessLayer.Concrete
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Proficiency>()
-            .HasData(
-            new Proficiency { ProficiencyID = 1, Name = "Combat" },
-            new Proficiency { ProficiencyID = 2, Name = "Magic" });
-
-            modelBuilder.Entity<Class>()
-            .HasData(
-            new Class { ClassID = 1, Name = "Wizard", Speed = 30, HitDice = "1d8", ProficiencyID = 1 },
-            new Class { ClassID = 2, Name = "Fighter", Speed = 25, HitDice = "1d10", ProficiencyID = 2 });
-
+            // First, create ItemTypes
             modelBuilder.Entity<ItemType>()
             .HasData(
-            new ItemType { ItemTypeID = 1, Type = "Weapon" },
-            new ItemType { ItemTypeID = 2, Type = "Armor" });
+                new ItemType { ItemTypeID = 1, Type = "Weapon" },
+                new ItemType { ItemTypeID = 2, Type = "Armor" }
+            );
 
+            // Then create Items
             modelBuilder.Entity<Item>()
             .HasData(
-            new Item { ItemID = 1, Name = "Sword", GP = 10, Description = "A sharp blade.", ItemTypeID = 1 },
-            new Item { ItemID = 2, Name = "Shield", GP = 15, Description = "Protects against attacks.", ItemTypeID = 2 }
+                new Item
+                {
+                    ItemID = 1,
+                    Name = "Sword",
+                    GP = 10,
+                    Description = "A sharp blade.",
+                    ItemTypeID = 1,
+                    ItemType = new ItemType { ItemTypeID = 1, Type = "Weapon" }
+                },
+                new Item
+                {
+                    ItemID = 2,
+                    Name = "Shield",
+                    GP = 15,
+                    Description = "Protects against attacks.",
+                    ItemTypeID = 2,
+                    ItemType = new ItemType { ItemTypeID = 2, Type = "Armor" }
+                }
             );
 
-            modelBuilder.Entity<Armor>()
-            .HasData(new Armor { Defense = 18, ArmorTypeID = 1, ItemID = 2 });
+            // Create Misc items
+            modelBuilder.Entity<Misc>()
+            .HasData(
+                new Misc
+                {
+                    MiscID = 1,
+                    ItemID = 1,
+                    Item = new Item
+                    {
+                        ItemID = 1,
+                        Name = "Sword",
+                        GP = 10,
+                        Description = "A sharp blade.",
+                        ItemTypeID = 1,
+                        ItemType = new ItemType { ItemTypeID = 1, Type = "Weapon" }
+                    }
+                },
+                new Misc
+                {
+                    MiscID = 2,
+                    ItemID = 2,
+                    Item = new Item
+                    {
+                        ItemID = 2,
+                        Name = "Shield",
+                        GP = 15,
+                        Description = "Protects against attacks.",
+                        ItemTypeID = 2,
+                        ItemType = new ItemType { ItemTypeID = 2, Type = "Armor" }
+                    }
+                }
+            );
 
+            // Create ArmorTypes
+            modelBuilder.Entity<ArmorType>()
+            .HasData(
+                new ArmorType { ArmorTypeID = 1, Type = "Light" }
+            );
+
+            // Create Armors
+            modelBuilder.Entity<Armor>()
+            .HasData(
+                new Armor
+                {
+                    ArmorID = 1,
+                    ArmorClass = 18,
+                    ArmorTypeID = 1,
+                    Item = new Item
+                    {
+                        ItemID = 2,
+                        Name = "Shield",
+                        GP = 15,
+                        Description = "Protects against attacks.",
+                        ItemTypeID = 2,
+                        ItemType = new ItemType { ItemTypeID = 2, Type = "Armor" }
+                    },
+                    ArmorType = new ArmorType { ArmorTypeID = 1, Type = "Light" }
+                }
+            );
+
+            // Create Users
             modelBuilder.Entity<User>()
             .HasData(
-            new User { UserID = 1, Name = "Admin", Surname = "User", Email = "admin@infectores.com", PasswordHash = "admin123", IsAdmin = true },
-            new User { UserID = 2, Name = "Test", Surname = "User", Email = "test@infectores.com", PasswordHash = "test123", IsAdmin = false }
+                new User
+                {
+                    UserID = 1,
+                    Name = "Admin",
+                    Surname = "User",
+                    Email = "admin@infectores.com",
+                    PasswordHash = "admin123",
+                    IsAdmin = true
+                },
+                new User
+                {
+                    UserID = 2,
+                    Name = "Test",
+                    Surname = "User",
+                    Email = "test@infectores.com",
+                    PasswordHash = "test123",
+                    IsAdmin = false
+                }
             );
 
-            modelBuilder.Entity<Character>()
+            // Create Proficiencies
+            modelBuilder.Entity<Proficiency>()
             .HasData(
-            new Character { CharacterID = 1, Name = "Aragorn", Surname = "Son of Arathorn", UserID = 1, ClassID = 2, Level = 5, XP = 1200, ArmorClass = 15 },
-            new Character { CharacterID = 2, Name = "Gandalf", Surname = "The Grey", UserID = 2, ClassID = 1, Level = 10, XP = 3000, ArmorClass = 12 });
+                new Proficiency { ProficiencyID = 1, Name = "Combat" },
+                new Proficiency { ProficiencyID = 2, Name = "Magic" }
+            );
 
+            // Create Classes
+            modelBuilder.Entity<Class>()
+            .HasData(
+                new Class
+                {
+                    ClassID = 1,
+                    Name = "Wizard",
+                    Speed = 30,
+                    HitDice = "1d8",
+                    ProficiencyID = 1
+                },
+                new Class
+                {
+                    ClassID = 2,
+                    Name = "Fighter",
+                    Speed = 25,
+                    HitDice = "1d10",
+                    ProficiencyID = 2
+                }
+            );
+
+            // Create Tools
+            modelBuilder.Entity<Tool>()
+            .HasData(
+                new Tool { ToolID = 1, Name = "Thieves' Tools" },
+                new Tool { ToolID = 2, Name = "Herbalism Kit" }
+            );
+
+            // Create ProficiencyTools
             modelBuilder.Entity<ProficiencyTool>()
             .HasData(
-            new ProficiencyTool { ProficiencyID = 1, ToolID = 1 },
-            new ProficiencyTool { ProficiencyID = 2, ToolID = 2 });
-
-            modelBuilder.Entity<Class>().HasData(new Class { ClassID = 1, Name = "Wizard", Speed = 30, HitDice = "1d8", ProficiencyID = 1 });
+                new ProficiencyTool
+                {
+                    ProficiencyID = 1,
+                    ToolID = 1,
+                    Proficiency = new Proficiency { ProficiencyID = 1, Name = "Combat" },
+                    Tool = new Tool { ToolID = 1, Name = "Thieves' Tools" }
+                },
+                new ProficiencyTool
+                {
+                    ProficiencyID = 2,
+                    ToolID = 2,
+                    Proficiency = new Proficiency { ProficiencyID = 2, Name = "Magic" },
+                    Tool = new Tool { ToolID = 2, Name = "Herbalism Kit" }
+                }
+            );
         }
     }
+
     public class Context : DbContext
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
@@ -185,12 +311,10 @@ namespace Backend.DataAccessLayer.Concrete
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Misc>()
-                .HasKey(m => m.ItemID);
-
-            modelBuilder.Entity<Misc>()
                 .HasOne(m => m.Item)
                 .WithOne(i => i.Misc)
-                .HasForeignKey<Misc>(m => m.ItemID);
+                .HasForeignKey<Misc>(m => m.ItemID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SpellComponent>()
                 .HasKey(sc => new { sc.SpellID, sc.ComponentID });
@@ -206,11 +330,6 @@ namespace Backend.DataAccessLayer.Concrete
                 .WithMany()
                 .HasForeignKey(sc => sc.ComponentID)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Proficiency>().HasData(new Proficiency { ProficiencyID = 1, Name = "Combat" });
-
-            modelBuilder.Entity<Class>()
-                .HasData(new Class { ClassID = 1, HitDice = "1d8", Name = "Wizard", ProficiencyID = 1, Speed = 30 });
 
             modelBuilder.Entity<CharacterBonusAction>()
                 .HasOne(cba => cba.Character)
@@ -240,6 +359,5 @@ namespace Backend.DataAccessLayer.Concrete
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
         }
-
     }
 }

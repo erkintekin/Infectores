@@ -38,12 +38,12 @@ namespace Backend.DataAccessLayer.Concrete.Repositories
                 }
             }
 
-            return await query.ToListAsync();
+            return await query.ToListAsync().ConfigureAwait(false);
         }
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FindAsync(id).ConfigureAwait(false);
         }
 
         public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
@@ -58,34 +58,35 @@ namespace Backend.DataAccessLayer.Concrete.Repositories
                 }
             }
 
-            return await query.FirstOrDefaultAsync(filter);
+            return await query.FirstOrDefaultAsync(filter).ConfigureAwait(false);
         }
 
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
         {
-            return await _dbSet.AnyAsync(filter);
+            return await _dbSet.AnyAsync(filter).ConfigureAwait(false);
         }
 
         public async Task<T> AddAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity).ConfigureAwait(false);
             return entity;
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public Task<T> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            return entity;
+            return Task.FromResult(entity);
         }
 
-        public async Task DeleteAsync(T entity)
+        public Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
+            return Task.CompletedTask;
         }
 
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

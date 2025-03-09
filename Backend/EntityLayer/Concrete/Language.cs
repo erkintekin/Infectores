@@ -10,6 +10,12 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int LanguageID { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
+        public ICollection<CharacterLanguage> CharacterLanguages { get; set; }
+
+        public Language()
+        {
+            CharacterLanguages = new List<CharacterLanguage>();
+        }
     }
 }

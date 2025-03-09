@@ -7,7 +7,7 @@ namespace Backend.DTOs
     {
         public int ProficiencyID { get; set; }
         public int ToolID { get; set; }
-        public string ProficiencyName { get; set; }
-        public string ToolName { get; set; }
+        public required string ProficiencyName { get; set; }
+        public required string ToolName { get; set; }
     }
 }

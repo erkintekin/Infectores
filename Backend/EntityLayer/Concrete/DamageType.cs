@@ -11,7 +11,15 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int DamageTypeID { get; set; }
-        public string Type { get; set; }  // Bludgeoning, Piercing etc.
+        public required string Type { get; set; }  // Bludgeoning, Piercing etc.
         public string? Description { get; set; }
+        public ICollection<Weapon> Weapons { get; set; }
+        public ICollection<Spell> Spells { get; set; }
+
+        public DamageType()
+        {
+            Weapons = new List<Weapon>();
+            Spells = new List<Spell>();
+        }
     }
 }

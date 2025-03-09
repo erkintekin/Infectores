@@ -15,15 +15,18 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Spell> _spellRepository;
         private readonly IRepository<CharacterSpell> _characterSpellRepository;
+        private readonly IRepository<Character> _characterRepository;
         private readonly IMapper _mapper;
 
         public SpellManager(
             IRepository<Spell> spellRepository,
             IRepository<CharacterSpell> characterSpellRepository,
+            IRepository<Character> characterRepository,
             IMapper mapper)
         {
             _spellRepository = spellRepository;
             _characterSpellRepository = characterSpellRepository;
+            _characterRepository = characterRepository;
             _mapper = mapper;
         }
 
@@ -96,11 +99,19 @@ namespace Backend.BusinessLayer.Concrete
                 throw new InvalidOperationException("Character already has this spell.");
             }
 
+            var character = await _characterRepository.GetByIdAsync(characterId)
+                ?? throw new KeyNotFoundException($"Character with ID {characterId} not found.");
+
+            var spell = await _spellRepository.GetByIdAsync(spellId)
+                ?? throw new KeyNotFoundException($"Spell with ID {spellId} not found.");
+
             var characterSpell = new CharacterSpell
             {
                 CharacterID = characterId,
                 SpellID = spellId,
-                Level = 1
+                Level = 1,
+                Character = character,
+                Spell = spell
             };
 
             await _characterSpellRepository.AddAsync(characterSpell);

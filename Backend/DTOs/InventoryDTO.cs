@@ -6,7 +6,7 @@ namespace Backend.DTOs
         public int CharacterID { get; set; }
         public float TotalWeight { get; set; }
         public float TotalValue { get; set; }
-        public List<InventoryItemDTO> Items { get; set; }
+        public required List<InventoryItemDTO> Items { get; init; } = new();
     }
 
     public class InventoryCreateDTO

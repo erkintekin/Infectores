@@ -12,8 +12,16 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int AbilityID { get; set; }
-        public string AbilityName { get; set; }
-        public string Value { get; set; }
+        public required string AbilityName { get; set; }
+        public required string Value { get; set; }
         public string? Description { get; set; }
+        public ICollection<CharacterAbility> CharacterAbilities { get; set; }
+        public ICollection<Skill> Skills { get; set; }
+
+        public Ability()
+        {
+            CharacterAbilities = new List<CharacterAbility>();
+            Skills = new List<Skill>();
+        }
     }
 }

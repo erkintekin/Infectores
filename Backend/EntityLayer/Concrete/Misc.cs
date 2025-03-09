@@ -9,8 +9,10 @@ namespace Backend.EntityLayer.Concrete
 {
     public class Misc
     {
-        [Key, ForeignKey(nameof(Item))]
+        [Key]
+        public int MiscID { get; set; }
+        [ForeignKey("Item")]
         public int ItemID { get; set; }
-        public Item Item { get; set; }
+        public required Item Item { get; set; }
     }
 }

@@ -12,9 +12,15 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int BonusActionID { get; set; }
-        public string ActionName { get; set; }
-        public int? SpellID { get; set; }
-        public Spell Spell { get; set; }
-        public string Description { get; set; }
+        public required string ActionName { get; set; }
+        public int SpellID { get; set; }
+        public required Spell Spell { get; set; }
+        public required string Description { get; set; }
+        public ICollection<CharacterBonusAction> CharacterBonusActions { get; set; }
+
+        public BonusAction()
+        {
+            CharacterBonusActions = new List<CharacterBonusAction>();
+        }
     }
 }

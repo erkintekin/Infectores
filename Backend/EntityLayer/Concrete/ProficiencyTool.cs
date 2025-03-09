@@ -12,11 +12,11 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         [Column(Order = 1)]
         public int ProficiencyID { get; set; }
-        public Proficiency Proficiency { get; set; }
+        public required Proficiency Proficiency { get; set; }
 
         [Key]
         [Column(Order = 2)]
         public int ToolID { get; set; }
-        public Tool Tool { get; set; }
+        public required Tool Tool { get; set; }
     }
 }

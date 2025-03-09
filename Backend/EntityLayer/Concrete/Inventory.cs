@@ -12,7 +12,12 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         public int InventoryID { get; set; }
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
         public ICollection<InventoryItem> InventoryItems { get; set; }
+
+        public Inventory()
+        {
+            InventoryItems = new List<InventoryItem>();
+        }
     }
 }

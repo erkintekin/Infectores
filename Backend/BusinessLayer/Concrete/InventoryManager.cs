@@ -16,15 +16,18 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Inventory> _inventoryRepository;
         private readonly IRepository<InventoryItem> _inventoryItemRepository;
+        private readonly IRepository<Item> _itemRepository;
         private readonly IMapper _mapper;
 
         public InventoryManager(
             IRepository<Inventory> inventoryRepository,
             IRepository<InventoryItem> inventoryItemRepository,
+            IRepository<Item> itemRepository,
             IMapper mapper)
         {
             _inventoryRepository = inventoryRepository;
             _inventoryItemRepository = inventoryItemRepository;
+            _itemRepository = itemRepository;
             _mapper = mapper;
         }
 
@@ -49,11 +52,19 @@ namespace Backend.BusinessLayer.Concrete
             }
             else
             {
+                var inventory = await _inventoryRepository.GetByIdAsync(inventoryId)
+                    ?? throw new KeyNotFoundException($"Inventory with ID {inventoryId} not found.");
+
+                var item = await _itemRepository.GetByIdAsync(itemId)
+                    ?? throw new KeyNotFoundException($"Item with ID {itemId} not found.");
+
                 var inventoryItem = new InventoryItem
                 {
                     InventoryID = inventoryId,
                     ItemID = itemId,
-                    Quantity = quantity
+                    Quantity = quantity,
+                    Inventory = inventory,
+                    Item = item
                 };
                 await _inventoryItemRepository.AddAsync(inventoryItem);
             }

@@ -11,6 +11,12 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int WeaponTypeID { get; set; }
-        public string Type { get; set; }
+        public required string Type { get; set; }
+        public ICollection<Weapon> Weapons { get; set; }
+
+        public WeaponType()
+        {
+            Weapons = new List<Weapon>();
+        }
     }
 }

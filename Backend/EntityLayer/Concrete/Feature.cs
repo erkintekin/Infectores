@@ -10,7 +10,13 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int FeatureID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
+        public ICollection<CharacterFeature> CharacterFeatures { get; set; }
+
+        public Feature()
+        {
+            CharacterFeatures = new List<CharacterFeature>();
+        }
     }
 }

@@ -12,6 +12,12 @@ namespace Backend.EntityLayer.Concrete
     {
         [Key]
         public int ArmorTypeID { get; set; }
-        public string Type { get; set; }
+        public required string Type { get; set; }
+        public ICollection<Armor> Armors { get; set; }
+
+        public ArmorType()
+        {
+            Armors = new List<Armor>();
+        }
     }
 }

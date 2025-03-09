@@ -5,12 +5,11 @@ namespace Backend.EntityLayer.Concrete
 {
     public class CharacterLanguage
     {
-        [Key, Column(Order = 1)]
+        [Key]
+        public int CharacterLanguageID { get; set; }
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
-
-        [Key, Column(Order = 2)]
+        public required Character Character { get; set; }
         public int LanguageID { get; set; }
-        public Language Language { get; set; }
+        public required Language Language { get; set; }
     }
 }

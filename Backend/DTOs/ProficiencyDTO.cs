@@ -10,11 +10,18 @@ namespace Backend.DTOs
 
         [Required]
         [StringLength(50)]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        public string Description { get; set; }
+        [Required]
+        public required string Description { get; set; }
 
-        public ICollection<int> CharacterIds { get; set; }
-        public ICollection<int> ToolIds { get; set; }
+        public required ICollection<int> CharacterIds { get; init; }
+        public required ICollection<int> ToolIds { get; init; }
+
+        public ProficiencyDTO()
+        {
+            CharacterIds = new List<int>();
+            ToolIds = new List<int>();
+        }
     }
 }

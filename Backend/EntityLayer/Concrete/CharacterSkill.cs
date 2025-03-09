@@ -12,12 +12,12 @@ namespace Backend.EntityLayer.Concrete
         [Key]
         [Column(Order = 1)]
         public int CharacterID { get; set; }
-        public Character Character { get; set; }
+        public required Character Character { get; set; }
 
         [Key]
         [Column(Order = 2)]
         public int SkillID { get; set; }
-        public Skill Skill { get; set; }
+        public required Skill Skill { get; set; }
         public int Bonus { get; set; }
         public int Value { get; set; }
         public bool IsProficient { get; set; }

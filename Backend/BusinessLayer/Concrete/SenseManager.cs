@@ -15,12 +15,18 @@ namespace Backend.BusinessLayer.Concrete
     {
         private readonly IRepository<Sense> _senseRepository;
         private readonly IRepository<CharacterSenses> _characterSensesRepository;
+        private readonly IRepository<Character> _characterRepository;
         private readonly IMapper _mapper;
 
-        public SenseManager(IRepository<Sense> senseRepository, IRepository<CharacterSenses> characterSensesRepository, IMapper mapper)
+        public SenseManager(
+            IRepository<Sense> senseRepository,
+            IRepository<CharacterSenses> characterSensesRepository,
+            IRepository<Character> characterRepository,
+            IMapper mapper)
         {
             _senseRepository = senseRepository;
             _characterSensesRepository = characterSensesRepository;
+            _characterRepository = characterRepository;
             _mapper = mapper;
         }
 
@@ -67,13 +73,20 @@ namespace Backend.BusinessLayer.Concrete
             return true;
         }
 
-        // Additional methods for character senses
         public async Task<CharacterSenses> AddSenseToCharacterAsync(int characterId, int senseId)
         {
+            var character = await _characterRepository.GetByIdAsync(characterId)
+                ?? throw new NotFoundException($"Character with ID {characterId} not found");
+
+            var sense = await _senseRepository.GetByIdAsync(senseId)
+                ?? throw new NotFoundException($"Sense with ID {senseId} not found");
+
             var characterSense = new CharacterSenses
             {
                 CharacterID = characterId,
-                SenseID = senseId
+                SenseID = senseId,
+                Character = character,
+                Sense = sense
             };
 
             var addedCharacterSense = await _characterSensesRepository.AddAsync(characterSense);
